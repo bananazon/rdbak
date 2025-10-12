@@ -29,6 +29,7 @@ var (
 		Short: "rdbak is a command line utility to backup your raindrop.io bookmarks",
 		Long:  "rdbak is a command line utility to backup your raindrop.io bookmarks",
 	}
+	versionFull bool
 )
 
 func Execute() error {
