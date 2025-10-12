@@ -10,6 +10,7 @@ import (
 var (
 	backupCmd = &cobra.Command{
 		Use:          "backup",
+		Aliases:      []string{"b"},
 		Short:        "Back your raindrop.io bookmarks up to a YAML file",
 		Long:         "Back your raindrop.io bookmarks up to a YAML file",
 		PreRunE:      backupPreRunCmd,
@@ -29,7 +30,7 @@ func init() {
 		logger.Exit(2)
 	}
 
-	GetBackupFlags(backupCmd)
+	GetFlags(backupCmd)
 	rootCmd.AddCommand(backupCmd)
 }
 
