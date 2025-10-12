@@ -3,10 +3,13 @@ package raindrop
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/gdanko/rdbak/pkg/api"
 	"github.com/gdanko/rdbak/pkg/crypt"
 	"github.com/gdanko/rdbak/pkg/data"
+	"github.com/gdanko/rdbak/pkg/util"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
@@ -80,8 +83,7 @@ func (r *Raindrop) DecryptPassword() (err error) {
 }
 
 func (r *Raindrop) Backup() (err error) {
-	r.Logger.Info("Starting bookmarks backup")
-	r.Logger.Infof("Using bookmarks file %s", r.Config.BookmarksFile)
+	r.Logger.Info("Starting bookmarks backup.")
 
 	err = r.LoadBookmarks()
 	if err != nil {
@@ -170,6 +172,21 @@ func (r *Raindrop) SaveBookmarks() (err error) {
 		return nil
 	}
 
+	if util.FileExists(r.Config.BookmarksFile) {
+		backupFilename := filepath.Join(
+			r.Config.ExportDir,
+			fmt.Sprintf("bookmarks-%d.yaml", time.Now().Unix()),
+		)
+
+		r.Logger.Infof("Copying %s to %s.", r.Config.BookmarksFile, backupFilename)
+		r.Logger.Infof("Saving bookmarks to %s.", r.Config.BookmarksFile)
+
+		err = os.Rename(r.Config.BookmarksFile, backupFilename)
+		if err != nil {
+			return fmt.Errorf("failed to rename %s to %s: %s", r.Config.BookmarksFile, backupFilename, err.Error())
+		}
+	}
+
 	err = os.WriteFile(r.Config.BookmarksFile, yamlBookmarks, 0644)
 	if err != nil {
 		return err
@@ -181,7 +198,7 @@ func (r *Raindrop) SaveBookmarks() (err error) {
 func (r *Raindrop) LoadBookmarks() (err error) {
 	r.Bookmarks = make([]*data.Bookmark, 0)
 
-	if _, err = os.Stat(r.Config.BookmarksFile); err == nil {
+	if util.FileExists(r.Config.BookmarksFile) {
 		contents, err := os.ReadFile(r.Config.BookmarksFile)
 		if err != nil {
 			return err
