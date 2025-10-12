@@ -1,11 +1,14 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/gdanko/rdbak/pkg/globals"
 	"github.com/gdanko/rdbak/pkg/raindrop"
 	"github.com/gdanko/rdbak/pkg/util"
-	"github.com/kr/pretty"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -44,7 +47,31 @@ func encryptPasswordPreRunCmd(cmd *cobra.Command, args []string) (err error) {
 	return nil
 }
 
-func encryptPasswordRunCmd(cmd *cobra.Command, args []string) error {
-	pretty.Println(rd)
+func encryptPasswordRunCmd(cmd *cobra.Command, args []string) (err error) {
+	if len(rd.Config.Password) == 0 {
+		return fmt.Errorf("config has no plaintext password")
+	}
+
+	if len(rd.Config.EncryptedPassword) > 0 {
+		return fmt.Errorf("config already has an encrypted password")
+	}
+
+	err = rd.EncryptPassword()
+	if err != nil {
+		return err
+	}
+
+	rd.Config.Password = ""
+
+	configBytes, err := yaml.Marshal(&rd.Config)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(rd.ConfigPath, configBytes, 0644)
+	if err != nil {
+		return nil
+	}
+
 	return nil
 }
