@@ -148,7 +148,7 @@ func LimitLength(filename string, maxLen int) string {
 }
 
 func safeDeleteFile(filename string) (err error) {
-	if _, err = os.Stat(filename); err != nil {
+	if util.FileExists(filename) {
 		return nil
 	}
 
@@ -214,7 +214,7 @@ func (ac *APIClient) DownloadFileIfMissing(id uint64, dir string) (bool, error) 
 	filename := ac.getFileName(id, resp)
 	filename = path.Join(dir, filename)
 
-	if stat, err := os.Stat(filename); err == nil && stat.Size() != 0 {
+	if util.FileExists(filename) && util.FileSize(filename) != 0 {
 		ac.Logger.Infof("File exists; skipping: %s", filename)
 		return false, nil
 	}
