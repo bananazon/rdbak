@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/gdanko/rdbak/globals"
+	"github.com/gdanko/rdbak/pkg/globals"
 )
 
 func Encrypt(msg string) (ciphertext string, err error) {

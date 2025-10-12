@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/gdanko/rdbak/globals"
-	"github.com/gdanko/rdbak/util"
+	"github.com/gdanko/rdbak/pkg/globals"
+	"github.com/gdanko/rdbak/pkg/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

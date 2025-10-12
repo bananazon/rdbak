@@ -1,17 +1,17 @@
 package cmd
 
 import (
-	"github.com/gdanko/rdbak/globals"
+	"github.com/gdanko/rdbak/pkg/globals"
 	"github.com/gdanko/rdbak/pkg/raindrop"
-	"github.com/gdanko/rdbak/util"
+	"github.com/gdanko/rdbak/pkg/util"
 	"github.com/spf13/cobra"
 )
 
 var (
 	backupCmd = &cobra.Command{
 		Use:          "backup",
-		Short:        "Back your raindrop.io bookmarks up to a JSON file",
-		Long:         "Back your raindrop.io bookmarks up to a JSON file",
+		Short:        "Back your raindrop.io bookmarks up to a YAML file",
+		Long:         "Back your raindrop.io bookmarks up to a YAML file",
 		PreRunE:      backupPreRunCmd,
 		RunE:         backupRunCmd,
 		SilenceUsage: false,

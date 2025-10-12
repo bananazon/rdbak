@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -16,7 +15,7 @@ import (
 
 	"github.com/gdanko/rdbak/pkg/cookie_jar"
 	"github.com/gdanko/rdbak/pkg/data"
-	"github.com/gdanko/rdbak/util"
+	"github.com/gdanko/rdbak/pkg/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -26,8 +25,9 @@ const timeoutSec = 60
 const loginUrl = "https://api.raindrop.io/v1/auth/email/login"
 const listUrl = "https://api.raindrop.io/v1/raindrops/0?sort=-lastUpdate&perpage=%v&page=%v&version=2"
 const downloadUrl = "https://api.raindrop.io/v1/raindrop/%v/cache?download"
-const collsUrl = "https://api.raindrop.io/v1/collections"
-const collsChildrenUrl = "https://api.raindrop.io/v1/collections/childrens"
+
+// const collsUrl = "https://api.raindrop.io/v1/collections"
+// const collsChildrenUrl = "https://api.raindrop.io/v1/collections/childrens"
 
 type APIClient struct {
 	Jar            *cookie_jar.CookieJar
@@ -113,7 +113,7 @@ func (ac *APIClient) ListBookmarks(page int) (listResult data.ListRes, err error
 		return listResult, fmt.Errorf("bad status at list bookmarks: %d: %s", resp.StatusCode, resp.Status)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return listResult, err
 	}
