@@ -12,10 +12,9 @@ import (
 )
 
 type Config struct {
-	ConfigPath        string
 	Email             string `yaml:"email"`
-	Password          string `yaml:"password"`
-	EncryptedPassword string `yaml:"encryptedPassword"`
+	Password          string `yaml:"password,omitempty"`
+	EncryptedPassword string `yaml:"encryptedPassword,omitempty"`
 	BookmarksFile     string `yaml:"bookmarksFile"`
 	ExportDir         string `yaml:"exportDir"`
 }
@@ -49,7 +48,14 @@ func (r *Raindrop) ParseConfig() (err error) {
 	}
 
 	if len(r.Config.Password) == 0 {
-		return fmt.Errorf("please add your plaintext password to %s", r.ConfigPath)
+		if len(r.Config.EncryptedPassword) > 0 {
+			err = r.DecryptPassword()
+			if err != nil {
+				return err
+			}
+		} else {
+			return fmt.Errorf("both password and passwordEncrypted fields in the config are empty; please fix this")
+		}
 	}
 
 	return nil
@@ -61,6 +67,15 @@ func (r *Raindrop) EncryptPassword() (err error) {
 		return err
 	}
 	r.Config.EncryptedPassword = ciphertext
+	return nil
+}
+
+func (r *Raindrop) DecryptPassword() (err error) {
+	plaintext, err := crypt.Decrypt(r.Config.EncryptedPassword)
+	if err != nil {
+		return err
+	}
+	r.Config.Password = plaintext
 	return nil
 }
 
