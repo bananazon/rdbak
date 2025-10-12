@@ -35,7 +35,7 @@ func Encrypt(msg string) (ciphertext string, err error) {
 	return ciphertext, nil
 }
 
-func Decrypt(encrypted string, keyHex string) (plaintext string, err error) {
+func Decrypt(encrypted string) (plaintext string, err error) {
 	key, _ := hex.DecodeString(globals.GetHexKey())
 	enc, _ := hex.DecodeString(encrypted)
 
