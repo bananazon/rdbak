@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func GetBackupFlags(cmd *cobra.Command) {
+func GetFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&flagConfigFile, "config", "c", filepath.Join(globals.GetHomeDirectory(), ".config", "rdbak", "config.yaml"), "Specify a config file")
 	cmd.Flags().StringVar(&logLevelStr, "log", defaultLogLevel, fmt.Sprintf("The log level, one of: %s", util.ReturnLogLevels(logLevelMap)))
 }
