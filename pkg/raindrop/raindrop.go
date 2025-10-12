@@ -52,15 +52,10 @@ func (r *Raindrop) ParseConfig() (err error) {
 		return fmt.Errorf("please add your plaintext password to %s", r.ConfigPath)
 	}
 
-	err = r.encryptPassword()
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
-func (r *Raindrop) encryptPassword() (err error) {
+func (r *Raindrop) EncryptPassword() (err error) {
 	ciphertext, err := crypt.Encrypt(r.Config.Password)
 	if err != nil {
 		return err
@@ -140,10 +135,16 @@ func (r *Raindrop) Backup() (err error) {
 
 	// Report
 	var bookmarkString string = "bookmarks"
+	var fileString string = "files"
+
 	if len(changedBookmarks) == 1 {
 		bookmarkString = "bookmark"
 	}
-	r.Logger.Infof("Finished. %v %s new or changed; %v new file(s) downloaded.", len(changedBookmarks), bookmarkString, downloadCount)
+
+	if downloadCount == 1 {
+		fileString = "file"
+	}
+	r.Logger.Infof("Finished. %d %s new or changed; %d new %s downloaded.", len(changedBookmarks), bookmarkString, downloadCount, fileString)
 
 	return nil
 }
