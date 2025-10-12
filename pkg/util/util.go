@@ -3,6 +3,7 @@ package util
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"os"
 	"sort"
 	"strings"
@@ -51,4 +52,21 @@ func GenerateHex() (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(bytes), nil
+}
+
+// Return true if the specified file exists and false if it doesn't
+func FileExists(filename string) bool {
+	if _, err := os.Stat(filename); errors.Is(err, os.ErrNotExist) {
+		return false
+	} else {
+		return true
+	}
+}
+
+func FileSize(filename string) int64 {
+	if info, err := os.Stat(filename); errors.Is(err, os.ErrNotExist) {
+		return -1
+	} else {
+		return info.Size()
+	}
 }
