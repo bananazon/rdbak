@@ -1,6 +1,7 @@
 GOPATH := $(shell go env GOPATH)
 GOOS := $(shell go env GOOS)
 GOARCH := $(shell go env GOARCH)
+GOBIN := $(shell go env GOBIN)
 rdbak_VERSION := "0.1.0"
 
 GOOS ?= $(shell uname | tr '[:upper:]' '[:lower:]')
@@ -49,7 +50,7 @@ install:
 	@echo "Installing rdbak in ${GOPATH}/bin"
 	@echo "=================================================\n"
 
-	go install -race
+	GOOS=${GOOS} GOARCH=${GOARCH} go build -o "${GOBIN}/rdbak"
 
 #
 # General targets
