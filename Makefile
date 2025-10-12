@@ -19,7 +19,7 @@ mod-tidy:
 build: guard-rdbak_VERSION mod-tidy clean
 	@echo "================================================="
 	@echo "Building rdbak"
-	@echo "=================================================\n"
+	@echo "================================================="
 
 	@if [ ! -d "bin" ]; then \
 		mkdir "bin"; \
@@ -32,7 +32,7 @@ build: guard-rdbak_VERSION mod-tidy clean
 clean:
 	@echo "================================================="
 	@echo "Cleaning rdbak"
-	@echo "=================================================\n"
+	@echo "================================================="
 	@if [ -f bin/rdbak ]; then \
 		rm -f bin/rdbak; \
 	fi; \
@@ -41,16 +41,16 @@ clean:
 clean-all: clean
 	@echo "================================================="
 	@echo "Cleaning tarballs"
-	@echo "=================================================\n"
+	@echo "================================================="
 	@rm -f *.tgz 2>/dev/null
 
 .PHONY: install
 install:
 	@echo "================================================="
 	@echo "Installing rdbak in ${GOPATH}/bin"
-	@echo "=================================================\n"
+	@echo "================================================="
 
-	GOOS=${GOOS} GOARCH=${GOARCH} go build -o "${GOBIN}/rdbak"
+	GOOS=${GOOS} GOARCH=${GOARCH} go install
 
 #
 # General targets
