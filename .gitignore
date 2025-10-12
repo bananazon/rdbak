@@ -32,4 +32,5 @@ go.work.sum
 # .vscode/
 
 # Packeage-specific files
-binary*.tgz
+bin
+*.tgz
