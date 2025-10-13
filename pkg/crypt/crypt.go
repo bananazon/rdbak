@@ -7,12 +7,14 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+)
 
-	"github.com/gdanko/rdbak/pkg/globals"
+const (
+	hexKey string = "2a89f4811dae393b45e9d902388783b39a15ddd63a2cbf19b90f6a3e3dd9a06b"
 )
 
 func Encrypt(msg string) (ciphertext string, err error) {
-	key, _ := hex.DecodeString(globals.GetHexKey())
+	key, _ := hex.DecodeString(hexKey)
 	plaintext := []byte(msg)
 
 	block, err := aes.NewCipher(key)
@@ -36,7 +38,7 @@ func Encrypt(msg string) (ciphertext string, err error) {
 }
 
 func Decrypt(encrypted string) (plaintext string, err error) {
-	key, _ := hex.DecodeString(globals.GetHexKey())
+	key, _ := hex.DecodeString(hexKey)
 	enc, _ := hex.DecodeString(encrypted)
 
 	block, err := aes.NewCipher(key)
