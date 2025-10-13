@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"fmt"
 	"path/filepath"
 
-	"github.com/gdanko/rdbak/pkg/globals"
 	"github.com/gdanko/rdbak/pkg/util"
 	"github.com/spf13/cobra"
 )
@@ -19,8 +17,8 @@ func GetEncryptPasswordFlags(cmd *cobra.Command) {
 }
 
 func getCommonFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&flagConfigFile, "config", "c", filepath.Join(globals.GetHomeDirectory(), ".config", "rdbak", "config.yaml"), "Specify a config file")
-	cmd.Flags().StringVarP(&logLevelStr, "log", "l", defaultLogLevel, fmt.Sprintf("The log level, one of: %s", util.ReturnLogLevels(logLevelMap)))
+	homeDir, _ := util.GetHome()
+	cmd.Flags().StringVarP(&flagConfigFile, "config", "c", filepath.Join(homeDir, ".config", "rdbak", "config.yaml"), "Specify a config file")
 }
 
 func getBackupFlags(cmd *cobra.Command) {
