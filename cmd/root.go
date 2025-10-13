@@ -12,6 +12,7 @@ var (
 	err             error
 	flagConfigFile  string
 	flagNoColor     bool
+	flagPrune       bool
 	logger          *logrus.Logger
 	logLevel        logrus.Level
 	logLevelStr     string
