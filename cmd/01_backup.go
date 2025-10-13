@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/gdanko/rdbak/pkg/raindrop"
 	"github.com/spf13/cobra"
 )
@@ -33,8 +30,6 @@ func backupPreRunCmd(cmd *cobra.Command, args []string) {
 		logger.Error(err)
 		logger.Exit(1)
 	}
-	fmt.Println(rd.Config)
-	os.Exit(0)
 }
 
 func backupRunCmd(cmd *cobra.Command, args []string) {
