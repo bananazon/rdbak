@@ -1,12 +1,9 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/gdanko/rdbak/pkg/globals"
 	"github.com/gdanko/rdbak/pkg/raindrop"
-	"github.com/gdanko/rdbak/pkg/util"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -17,61 +14,54 @@ var (
 		Aliases:      []string{"encrypt", "e"},
 		Short:        "Replace your plaintext password in the config file with an encrypted string",
 		Long:         "Replace your plaintext password in the config file with an encrypted string",
-		PreRunE:      encryptPasswordPreRunCmd,
-		RunE:         encryptPasswordRunCmd,
+		PreRun:       encryptPasswordPreRunCmd,
+		Run:          encryptPasswordRunCmd,
 		SilenceUsage: false,
 	}
 )
 
 func init() {
-	logLevel = logLevelMap[logLevelStr]
-	logger = util.ConfigureLogger(logLevel, flagNoColor)
-
-	err = globals.SetHomeDirectory()
-	if err != nil {
-		logger.Error(err)
-		logger.Exit(2)
-	}
-
 	GetEncryptPasswordFlags(encryptPasswordCmd)
 	rootCmd.AddCommand(encryptPasswordCmd)
 }
 
-func encryptPasswordPreRunCmd(cmd *cobra.Command, args []string) (err error) {
+func encryptPasswordPreRunCmd(cmd *cobra.Command, args []string) {
 	rd = *raindrop.New(flagConfigFile, false, logger)
 	err = rd.ParseConfig()
 	if err != nil {
-		return err
+		logger.Error(err)
+		logger.Exit(1)
 	}
-
-	return nil
 }
 
-func encryptPasswordRunCmd(cmd *cobra.Command, args []string) (err error) {
+func encryptPasswordRunCmd(cmd *cobra.Command, args []string) {
 	if len(rd.Config.Password) == 0 {
-		return fmt.Errorf("config has no plaintext password")
+		logger.Error("config has no plaintext password")
+		logger.Exit(1)
 	}
 
 	if len(rd.Config.EncryptedPassword) > 0 {
-		return fmt.Errorf("config already has an encrypted password")
+		logger.Info("config already has an encrypted password")
+		logger.Exit(0)
 	}
 
 	err = rd.EncryptPassword()
 	if err != nil {
-		return err
+		logger.Error(err)
+		logger.Exit(1)
 	}
 
 	rd.Config.Password = ""
 
 	configBytes, err := yaml.Marshal(&rd.Config)
 	if err != nil {
-		return err
+		logger.Error(err)
+		logger.Exit(1)
 	}
 
 	err = os.WriteFile(rd.ConfigPath, configBytes, 0644)
 	if err != nil {
-		return nil
+		logger.Error(err)
+		logger.Exit(1)
 	}
-
-	return nil
 }
