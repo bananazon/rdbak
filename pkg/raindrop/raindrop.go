@@ -14,7 +14,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const Second = time.Second
+const Minute = time.Minute
+const Hour = time.Hour
 const Day = 24 * time.Hour
+const Week = 7 * Day
 
 type Config struct {
 	Email             string `yaml:"email"`
@@ -179,7 +183,7 @@ func (r *Raindrop) PruneBookmarks() {
 		r.Logger.Info("Looking for outdated backup files to prune.")
 
 		pattern := fmt.Sprintf("%s/%s", r.Config.ExportDir, "bookmarks-*.yaml")
-		timePeriod := 7 * Day
+		timePeriod := 1 * Week
 
 		oldFiles, err := util.FindOldFiles(pattern, timePeriod)
 		if err != nil {
