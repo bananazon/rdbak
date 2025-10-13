@@ -33,12 +33,12 @@ func init() {
 		logger.Exit(2)
 	}
 
-	GetFlags(encryptPasswordCmd)
+	GetEncryptPasswordFlags(encryptPasswordCmd)
 	rootCmd.AddCommand(encryptPasswordCmd)
 }
 
 func encryptPasswordPreRunCmd(cmd *cobra.Command, args []string) (err error) {
-	rd = *raindrop.New(flagConfigFile, logger)
+	rd = *raindrop.New(flagConfigFile, false, logger)
 	err = rd.ParseConfig()
 	if err != nil {
 		return err

@@ -30,12 +30,12 @@ func init() {
 		logger.Exit(2)
 	}
 
-	GetFlags(backupCmd)
+	GetBackupFlags(backupCmd)
 	rootCmd.AddCommand(backupCmd)
 }
 
 func backupPreRunCmd(cmd *cobra.Command, args []string) (err error) {
-	rd = *raindrop.New(flagConfigFile, logger)
+	rd = *raindrop.New(flagConfigFile, flagPrune, logger)
 	err = rd.ParseConfig()
 	if err != nil {
 		return err
