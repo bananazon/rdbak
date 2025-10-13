@@ -21,7 +21,6 @@ var (
 )
 
 func init() {
-	GetEncryptPasswordFlags(encryptPasswordCmd)
 	rootCmd.AddCommand(encryptPasswordCmd)
 }
 

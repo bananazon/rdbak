@@ -30,14 +30,13 @@ func ReturnLogLevels(levelMap map[string]logrus.Level) string {
 }
 
 // ConfigureLogger : Configure the logger
-func ConfigureLogger(flagNoColor bool, homeDir string) (logger *logrus.Logger) {
+func ConfigureLogger(flagNoColor bool, logFileName string) (logger *logrus.Logger) {
 	var (
 		disableColors    bool = false
 		disableTimestamp bool = true
 		err              error
 		isTerminal       bool = false
 		logfile          *os.File
-		logfilename      string   = filepath.Join(homeDir, ".config", "rdbak", "rdbak.log")
 		out              *os.File = os.Stderr
 	)
 
@@ -52,7 +51,7 @@ func ConfigureLogger(flagNoColor bool, homeDir string) (logger *logrus.Logger) {
 	if !isTerminal {
 		disableColors = true
 		disableTimestamp = false
-		logfile, err = os.OpenFile(logfilename, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+		logfile, err = os.OpenFile(logFileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 		if err == nil {
 			out = logfile
 		}
