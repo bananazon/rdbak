@@ -14,6 +14,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const Day = 24 * time.Hour
+
 type Config struct {
 	Email             string `yaml:"email"`
 	Password          string `yaml:"password,omitempty"`
@@ -29,14 +31,16 @@ type Raindrop struct {
 	Config       *Config
 	Logger       *logrus.Logger
 	NewBookmarks []*data.Bookmark
+	PruneOlder   bool
 }
 
-func New(configPath string, logger *logrus.Logger) *Raindrop {
+func New(configPath string, pruneOlder bool, logger *logrus.Logger) *Raindrop {
 	return &Raindrop{
 		API:        api.NewApiClient(logger),
 		ConfigPath: configPath,
 		Config:     &Config{},
 		Logger:     logger,
+		PruneOlder: pruneOlder,
 	}
 }
 
@@ -170,6 +174,35 @@ func (r *Raindrop) SaveBookmarks() (err error) {
 	yamlBookmarks, err := yaml.Marshal(r.NewBookmarks)
 	if err != nil {
 		return nil
+	}
+
+	if r.PruneOlder {
+		r.Logger.Info("Looking for older data files to prune.")
+
+		pattern := fmt.Sprintf("%s/%s", r.Config.ExportDir, "bookmarks-*.yaml")
+		timePeriod := 7 * Day
+
+		oldFiles, err := util.FindOldFiles(pattern, timePeriod)
+		if err != nil {
+			r.Logger.Warn("failed to find outdated data files")
+		} else {
+			if len(oldFiles) > 0 {
+				var filesString = "files"
+				if len(oldFiles) == 1 {
+					filesString = "file"
+				}
+				r.Logger.Infof("I found %d %s that can be pruned.", len(oldFiles), filesString)
+				for _, filename := range oldFiles {
+					r.Logger.Infof("Pruning %s", filename)
+					err = os.Remove(filename)
+					if err != nil {
+						r.Logger.Warnf("Failed to delete %s", filename)
+					}
+				}
+			} else {
+				r.Logger.Info("I found no outdated data files.")
+			}
+		}
 	}
 
 	if util.FileExists(r.Config.BookmarksFile) {

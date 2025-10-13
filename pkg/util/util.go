@@ -4,9 +4,13 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"fmt"
+	"log"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
@@ -63,10 +67,36 @@ func FileExists(filename string) bool {
 	}
 }
 
+// Return true if the specified file size > 0 and false if it isn't
 func FileSize(filename string) int64 {
 	if info, err := os.Stat(filename); errors.Is(err, os.ErrNotExist) {
 		return -1
 	} else {
 		return info.Size()
 	}
+}
+
+// Return a list of files that is older than olderThan
+func FindOldFiles(pattern string, olderThan time.Duration) ([]string, error) {
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		return nil, fmt.Errorf("glob error: %w", err)
+	}
+
+	var oldFiles []string
+	cutoff := time.Now().Add(-olderThan)
+
+	for _, file := range files {
+		info, err := os.Stat(file)
+		if err != nil {
+			log.Printf("skipping %s: %v", file, err)
+			continue
+		}
+
+		if !info.IsDir() && info.ModTime().Before(cutoff) {
+			oldFiles = append(oldFiles, file)
+		}
+	}
+
+	return oldFiles, nil
 }
