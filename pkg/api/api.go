@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"regexp"
@@ -19,12 +20,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const apiBase = "api.raindrop.io"
+const apiVersion = "v1"
 const PageSize = 40
 const maxFileNameLen = 128
 const timeoutSec = 60
-const loginUrl = "https://api.raindrop.io/v1/auth/email/login"
-const listUrl = "https://api.raindrop.io/v1/raindrops/0?sort=-lastUpdate&perpage=%v&page=%v&version=2"
-const downloadUrl = "https://api.raindrop.io/v1/raindrop/%v/cache?download"
 
 // const collsUrl = "https://api.raindrop.io/v1/collections"
 // const collsChildrenUrl = "https://api.raindrop.io/v1/collections/childrens"
@@ -55,9 +55,16 @@ func (ac *APIClient) Login(email, pass string) error {
 	payload := map[string]any{"email": email, "password": pass}
 	payloadStr, _ := json.Marshal(payload)
 
+	loginUrl := url.URL{
+		Scheme: "https",
+		Host:   apiBase,
+		Path:   fmt.Sprintf("%s/auth/email/login", apiVersion),
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSec*time.Second)
 	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, "POST", loginUrl, bytes.NewBuffer(payloadStr))
+
+	req, err := http.NewRequestWithContext(ctx, "POST", loginUrl.String(), bytes.NewBuffer(payloadStr))
 	if err != nil {
 		return err
 	}
@@ -94,9 +101,15 @@ func (ac *APIClient) Login(email, pass string) error {
 func (ac *APIClient) ListBookmarks(page int) (listResult data.ListRes, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSec*time.Second)
 	defer cancel()
-	url := fmt.Sprintf(listUrl, PageSize, page)
 
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	listUrl := url.URL{
+		Scheme:   "https",
+		Host:     apiBase,
+		Path:     fmt.Sprintf("%s/raindrops/0", apiVersion),
+		RawQuery: fmt.Sprintf("sort=-lastUpdate&perpage=%d&page=%d&version=2", PageSize, page),
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", listUrl.String(), nil)
 	if err != nil {
 		return listResult, err
 	}
@@ -194,7 +207,14 @@ func (ac *APIClient) DownloadFileIfMissing(id uint64, dir string) (bool, error) 
 
 	etc := util.NewExtensibleTimeoutContext(timeoutSec)
 	defer etc.Cancel()
-	url := fmt.Sprintf(downloadUrl, id)
+
+	downloadUrl := url.URL{
+		Scheme: "https",
+		Host:   apiBase,
+		Path:   fmt.Sprintf("%s/raindrop/%d/cache?download", apiVersion, id),
+	}
+	url := downloadUrl.String()
+
 	req, _ := http.NewRequestWithContext(etc.Context(), "GET", url, nil)
 
 	resp, err := ac.Client.Do(req)
