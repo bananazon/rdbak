@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/user"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
+	"golang.org/x/term"
 )
 
 // ReturnLogLevels : Return a comma-delimited list of log levels
@@ -28,23 +30,45 @@ func ReturnLogLevels(levelMap map[string]logrus.Level) string {
 }
 
 // ConfigureLogger : Configure the logger
-func ConfigureLogger(logLevel logrus.Level, flagNoColor bool) (logger *logrus.Logger) {
-	disableColors := false
+func ConfigureLogger(flagNoColor bool, homeDir string) (logger *logrus.Logger) {
+	var (
+		disableColors    bool = false
+		disableTimestamp bool = true
+		err              error
+		isTerminal       bool = false
+		logfile          *os.File
+		logfilename      string   = filepath.Join(homeDir, ".config", "rdbak", "rdbak.log")
+		out              *os.File = os.Stderr
+	)
+
+	if term.IsTerminal(int(os.Stdout.Fd())) {
+		isTerminal = true
+	}
+
 	if flagNoColor {
 		disableColors = true
 	}
+
+	if !isTerminal {
+		disableColors = true
+		disableTimestamp = false
+		logfile, err = os.OpenFile(logfilename, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+		if err == nil {
+			out = logfile
+		}
+	}
+
 	logger = &logrus.Logger{
-		Out:   os.Stderr,
-		Level: logLevel,
+		Out:   out,
+		Level: logrus.InfoLevel,
 		Formatter: &prefixed.TextFormatter{
 			DisableColors:    disableColors,
-			DisableTimestamp: true,
+			DisableTimestamp: disableTimestamp,
 			TimestampFormat:  "2006-01-02 15:04:05",
 			FullTimestamp:    true,
 			ForceFormatting:  false,
 		},
 	}
-	logger.SetLevel(logLevel)
 
 	return logger
 }
@@ -99,4 +123,16 @@ func FindOldFiles(pattern string, olderThan time.Duration) ([]string, error) {
 	}
 
 	return oldFiles, nil
+}
+
+func GetHome() (homeDir string, err error) {
+	userObj, err := user.Current()
+	if err != nil {
+		homeDir = os.Getenv("HOME")
+		if homeDir == "" {
+			return "", fmt.Errorf("failed to determine the path of your home directory: %s", err.Error())
+		}
+	}
+
+	return userObj.HomeDir, nil
 }
