@@ -14,7 +14,7 @@ import (
 var (
 	encryptPasswordCmd = &cobra.Command{
 		Use:          "encrypt-password",
-		Aliases:      []string{"encypt", "e"},
+		Aliases:      []string{"encrypt", "e"},
 		Short:        "Replace your plaintext password in the config file with an encrypted string",
 		Long:         "Replace your plaintext password in the config file with an encrypted string",
 		PreRunE:      encryptPasswordPreRunCmd,
