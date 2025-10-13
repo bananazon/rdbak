@@ -7,7 +7,8 @@
 * Instead of using `panic(err)`, I properly return and process the errors.
 * The config file and backup files are stored as YAML instead of JSON.
 * I'm using the [cobra](https://github.com/spf13/cobra) framework.
-* I make a timestamp'd copy of the backup file prior to saving the bookmarks.
+* When a backup is saved, the existing file is copied to a timestamp'd version.
+* Optional `--prune` flag to delete backup files older than 7 days.
 * Other small improvements.
 
 ## Installation
