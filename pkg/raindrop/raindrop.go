@@ -148,43 +148,42 @@ func (r *Raindrop) Backup() (err error) {
 		keptIds[bm.Id] = true
 	}
 
-	// Save updated bookmarks YAML
-	err = r.SaveBookmarks()
-	if err != nil {
-		return err
-	}
+	r.PruneBookmarks()
 
-	// Report
-	var bookmarkString string = "bookmarks"
-	var fileString string = "files"
+	if len(changedBookmarks) > 0 || downloadCount > 0 {
+		err = r.SaveBookmarks()
+		if err != nil {
+			return err
+		}
 
-	if len(changedBookmarks) == 1 {
-		bookmarkString = "bookmark"
-	}
+		var bookmarkString string = "bookmarks"
+		var fileString string = "files"
 
-	if downloadCount == 1 {
-		fileString = "file"
+		if len(changedBookmarks) == 1 {
+			bookmarkString = "bookmark"
+		}
+
+		if downloadCount == 1 {
+			fileString = "file"
+		}
+		r.Logger.Infof("Finished. %d %s new or changed; %d new %s downloaded.", len(changedBookmarks), bookmarkString, downloadCount, fileString)
+	} else {
+		r.Logger.Info("No new or changed bookmarks. No new downloaded files.")
 	}
-	r.Logger.Infof("Finished. %d %s new or changed; %d new %s downloaded.", len(changedBookmarks), bookmarkString, downloadCount, fileString)
 
 	return nil
 }
 
-func (r *Raindrop) SaveBookmarks() (err error) {
-	yamlBookmarks, err := yaml.Marshal(r.NewBookmarks)
-	if err != nil {
-		return nil
-	}
-
+func (r *Raindrop) PruneBookmarks() {
 	if r.PruneOlder {
-		r.Logger.Info("Looking for older data files to prune.")
+		r.Logger.Info("Looking for outdated backup files to prune.")
 
 		pattern := fmt.Sprintf("%s/%s", r.Config.ExportDir, "bookmarks-*.yaml")
 		timePeriod := 7 * Day
 
 		oldFiles, err := util.FindOldFiles(pattern, timePeriod)
 		if err != nil {
-			r.Logger.Warn("failed to find outdated data files")
+			r.Logger.Warn("failed to find outdated backup files")
 		} else {
 			if len(oldFiles) > 0 {
 				var filesString = "files"
@@ -200,9 +199,16 @@ func (r *Raindrop) SaveBookmarks() (err error) {
 					}
 				}
 			} else {
-				r.Logger.Info("I found no outdated data files.")
+				r.Logger.Info("No outdated backup files found.")
 			}
 		}
+	}
+}
+
+func (r *Raindrop) SaveBookmarks() (err error) {
+	yamlBookmarks, err := yaml.Marshal(r.NewBookmarks)
+	if err != nil {
+		return nil
 	}
 
 	if util.FileExists(r.Config.BookmarksFile) {
