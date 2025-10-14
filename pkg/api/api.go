@@ -86,7 +86,7 @@ func (ac *APIClient) Login(email, pass string) error {
 		return err
 	}
 
-	var loginRes data.ListRes
+	var loginRes data.ListResult
 	err = json.Unmarshal(body, &loginRes)
 	if err != nil {
 		return err
@@ -98,7 +98,7 @@ func (ac *APIClient) Login(email, pass string) error {
 	return nil
 }
 
-func (ac *APIClient) ListBookmarks(page int) (listResult data.ListRes, err error) {
+func (ac *APIClient) ListBookmarks(page int) (listResult data.ListResult, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSec*time.Second)
 	defer cancel()
 
