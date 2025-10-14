@@ -24,7 +24,7 @@ func init() {
 }
 
 func backupPreRunCmd(cmd *cobra.Command, args []string) {
-	rd = *raindrop.New(rdbakConfig, flagPrune, logger)
+	rd = *raindrop.New(rdbakHome, rdbakConfig, flagPrune, logger)
 	err = rd.ParseConfig()
 	if err != nil {
 		logger.Error(err)
