@@ -23,5 +23,13 @@
 * `rdbak encrypt-password`
 * `rdbak backup`
 
+## crontab
+I run it every five minutes
+```
+% crontab -l
+#rdbak
+*/5 * * * * /home/dummy/go/bin/rdbak backup --prune
+```
+
 ## More Coming Soon!
 I will populate more of this soon
