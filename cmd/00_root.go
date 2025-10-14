@@ -11,16 +11,15 @@ import (
 )
 
 var (
-	err            error
-	flagConfigFile string
-	flagNoColor    bool
-	flagPrune      bool
-	homeDir        string
-	logger         *logrus.Logger
-	rdbakConfig    string
-	rdbakHome      string
-	rdbakLogfile   string
-	rootCmd        = &cobra.Command{
+	err          error
+	flagNoColor  bool
+	flagPrune    bool
+	homeDir      string
+	logger       *logrus.Logger
+	rdbakConfig  string
+	rdbakHome    string
+	rdbakLogfile string
+	rootCmd      = &cobra.Command{
 		Use:   "rdbak",
 		Short: "rdbak is a command line utility to backup your raindrop.io bookmarks",
 		Long:  "rdbak is a command line utility to backup your raindrop.io bookmarks",
@@ -39,9 +38,9 @@ func init() {
 		os.Exit(1)
 	}
 
-	rdbakHome = filepath.Join(homeDir, ".config", "rdbak1")
+	rdbakHome = filepath.Join(homeDir, ".config", "rdbak")
 
-	err = util.VerifyRbakHome(rdbakHome)
+	err = util.VerifyRdbakHome(rdbakHome)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
