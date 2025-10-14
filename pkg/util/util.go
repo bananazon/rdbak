@@ -1,33 +1,18 @@
 package util
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"os/user"
 	"path/filepath"
-	"sort"
-	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 	"golang.org/x/term"
 )
-
-// ReturnLogLevels : Return a comma-delimited list of log levels
-func ReturnLogLevels(levelMap map[string]logrus.Level) string {
-	logLevels := make([]string, 0, len(levelMap))
-	for k := range levelMap {
-		logLevels = append(logLevels, k)
-	}
-	sort.Strings(logLevels)
-
-	return strings.Join(logLevels, ", ")
-}
 
 // ConfigureLogger : Configure the logger
 func ConfigureLogger(flagNoColor bool, logFileName string) (logger *logrus.Logger) {
@@ -70,15 +55,6 @@ func ConfigureLogger(flagNoColor bool, logFileName string) (logger *logrus.Logge
 	}
 
 	return logger
-}
-
-// Generate hex code
-func GenerateHex() (string, error) {
-	bytes := make([]byte, 32) // 32 bytes = 64 hex characters
-	if _, err := rand.Read(bytes); err != nil {
-		return "", err
-	}
-	return hex.EncodeToString(bytes), nil
 }
 
 // Return true if the specified file exists and false if it doesn't
@@ -134,4 +110,28 @@ func GetHome() (homeDir string, err error) {
 	}
 
 	return userObj.HomeDir, nil
+}
+
+func VerifyRbakHome(path string) error {
+	if info, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		err = os.MkdirAll(path, 0700)
+		if err != nil {
+			return fmt.Errorf("the path %s doesn't exist and couldn't be created: %s", path, err.Error())
+		} else {
+			return fmt.Errorf("the path %s was created, please add a config.yaml file and re-run this utility", path)
+		}
+	} else {
+		if info.IsDir() {
+			tmpFile := "tmpfile"
+			file, err := os.CreateTemp(path, tmpFile)
+			if err != nil {
+				return fmt.Errorf("%s exists and is a directory, but isn't writable", path)
+			}
+			defer os.Remove(file.Name())
+			defer file.Close()
+			return nil
+		} else {
+			return fmt.Errorf("%s exists but isn't a directory", path)
+		}
+	}
 }

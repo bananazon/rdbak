@@ -39,7 +39,14 @@ func init() {
 		os.Exit(1)
 	}
 
-	rdbakHome = filepath.Join(homeDir, ".config", "rdbak")
+	rdbakHome = filepath.Join(homeDir, ".config", "rdbak1")
+
+	err = util.VerifyRbakHome(rdbakHome)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	rdbakConfig = filepath.Join(rdbakHome, "config.yaml")
 	rdbakLogfile = filepath.Join(rdbakHome, "rdbak.log")
 	logger = util.ConfigureLogger(flagNoColor, rdbakLogfile)
