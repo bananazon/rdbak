@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"time"
 
 	"github.com/gdanko/rdbak/pkg/api"
@@ -109,7 +110,7 @@ func (r *Raindrop) Backup() (err error) {
 	}
 
 	// Get updated and new bookmarks
-	changedBookmarks, err := r.GetChangedBookmarks(idToBookmark)
+	changedBookmarks, removedBookmarks, err := r.GetChangedBookmarks(idToBookmark)
 	if err != nil {
 		return err
 	}
@@ -148,37 +149,54 @@ func (r *Raindrop) Backup() (err error) {
 		if _, exists := keptIds[bm.Id]; exists {
 			continue
 		}
-		r.NewBookmarks = append(r.NewBookmarks, bm)
-		keptIds[bm.Id] = true
+		if slices.Contains(removedBookmarks, bm.Id) {
+			r.Logger.Info("Skipping!")
+		} else {
+			r.NewBookmarks = append(r.NewBookmarks, bm)
+			keptIds[bm.Id] = true
+		}
 	}
 
-	r.PruneBookmarks()
+	r.PruneBackups()
 
-	if len(changedBookmarks) > 0 || downloadCount > 0 {
+	if len(changedBookmarks) > 0 || len(removedBookmarks) > 0 || downloadCount > 0 {
 		err = r.SaveBookmarks()
 		if err != nil {
 			return err
 		}
 
-		var bookmarkString string = "bookmarks"
+		var changedString string = "bookmarks"
 		var fileString string = "files"
+		var removedString = "bookmarks"
 
 		if len(changedBookmarks) == 1 {
-			bookmarkString = "bookmark"
+			changedString = "bookmark"
 		}
 
 		if downloadCount == 1 {
 			fileString = "file"
 		}
-		r.Logger.Infof("Finished. %d %s new or changed; %d new %s downloaded.", len(changedBookmarks), bookmarkString, downloadCount, fileString)
+
+		if len(removedBookmarks) == 1 {
+			removedString = "bookmark"
+		}
+		r.Logger.Infof(
+			"Finished. %d %s new or changed; %d %s removed; %d new %s downloaded.",
+			len(changedBookmarks),
+			changedString,
+			len(removedBookmarks),
+			removedString,
+			downloadCount,
+			fileString,
+		)
 	} else {
-		r.Logger.Info("No new or changed bookmarks. No new downloaded files.")
+		r.Logger.Info("No new or changed bookmarks; no removed bookmarks; no new files downloaded.")
 	}
 
 	return nil
 }
 
-func (r *Raindrop) PruneBookmarks() {
+func (r *Raindrop) PruneBackups() {
 	if r.PruneOlder {
 		r.Logger.Info("Looking for outdated backup files to prune.")
 
@@ -256,29 +274,46 @@ func (r *Raindrop) LoadBookmarks() (err error) {
 	return nil
 }
 
-func (r *Raindrop) GetChangedBookmarks(storedBookmarks map[uint64]*data.Bookmark) (changed []*data.Bookmark, err error) {
+func (r *Raindrop) GetChangedBookmarks(storedBookmarks map[uint64]*data.Bookmark) (changed []*data.Bookmark, removed []uint64, err error) {
+	var raindropBookmarks = make(map[uint64]*data.Bookmark)
+
 	page := 0
+	// Load all the bookmarks here first
 	for {
-		lr, err := r.API.ListBookmarks(page)
+		listResult, err := r.API.ListBookmarks(page)
 		if err != nil {
-			return changed, err
+			return changed, removed, err
 		}
 
-		over := len(lr.Items) < api.PageSize
-		for _, itm := range lr.Items {
-			if storedBm, exists := storedBookmarks[itm.Id]; !exists {
-				changed = append(changed, itm)
-			} else if itm.LastUpdate.After(storedBm.LastUpdate) {
-				changed = append(changed, itm)
-			}
+		for _, bookmark := range listResult.Items {
+			raindropBookmarks[bookmark.Id] = bookmark
 		}
-		// DBG
-		//over = true
+
+		over := len(listResult.Items) < api.PageSize
+
 		if over {
 			break
 		}
 		page += 1
 	}
 
-	return changed, nil
+	// Check for updates
+	for _, bookmarkItem := range raindropBookmarks {
+		storedBookmark, exists := storedBookmarks[bookmarkItem.Id]
+		if !exists {
+			changed = append(changed, bookmarkItem)
+		} else if bookmarkItem.LastUpdate.After(storedBookmark.LastUpdate) {
+			changed = append(changed, bookmarkItem)
+		}
+	}
+
+	// See if any need deleting
+	for _, bookmarkItem := range storedBookmarks {
+		_, exists := raindropBookmarks[bookmarkItem.Id]
+		if !exists {
+			removed = append(removed, bookmarkItem.Id)
+		}
+	}
+
+	return changed, removed, nil
 }
