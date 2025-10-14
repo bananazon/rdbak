@@ -18,14 +18,14 @@ type Bookmark struct {
 	Cache        Cache     `json:"cache" yaml:"cache"`
 }
 
-type ListRes struct {
+type ListResult struct {
 	Result       bool        `json:"result" yaml:"result"`
 	Items        []*Bookmark `json:"items" yaml:"items"`
 	Count        int         `json:"count" yaml:"count"`
 	ErrorMessage string      `json:"errorMessage" yaml:"errorMessage"`
 }
 
-type LoginRes struct {
+type LoginResult struct {
 	Result       bool   `json:"result" yaml:"result"`
 	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
 }
