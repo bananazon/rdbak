@@ -25,7 +25,7 @@ func init() {
 }
 
 func encryptPasswordPreRunCmd(cmd *cobra.Command, args []string) {
-	rd = *raindrop.New(flagConfigFile, false, logger)
+	rd = *raindrop.New(rdbakHome, rdbakConfig, false, logger)
 	err = rd.ParseConfig()
 	if err != nil {
 		logger.Error(err)
@@ -58,7 +58,7 @@ func encryptPasswordRunCmd(cmd *cobra.Command, args []string) {
 		logger.Exit(1)
 	}
 
-	err = os.WriteFile(rd.ConfigPath, configBytes, 0644)
+	err = os.WriteFile(rd.ConfigPath, configBytes, 0600)
 	if err != nil {
 		logger.Error(err)
 		logger.Exit(1)
