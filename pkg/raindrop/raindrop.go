@@ -34,16 +34,18 @@ type Raindrop struct {
 	Bookmarks    []*data.Bookmark
 	ConfigPath   string
 	Config       *Config
+	HomePath     string
 	Logger       *logrus.Logger
 	NewBookmarks []*data.Bookmark
 	PruneOlder   bool
 }
 
-func New(configPath string, pruneOlder bool, logger *logrus.Logger) *Raindrop {
+func New(homePath string, configPath string, pruneOlder bool, logger *logrus.Logger) *Raindrop {
 	return &Raindrop{
 		API:        api.NewApiClient(logger),
 		ConfigPath: configPath,
 		Config:     &Config{},
+		HomePath:   homePath,
 		Logger:     logger,
 		PruneOlder: pruneOlder,
 	}
@@ -110,7 +112,7 @@ func (r *Raindrop) Backup() (err error) {
 	}
 
 	// Get updated and new bookmarks
-	changedBookmarks, removedBookmarks, err := r.GetChangedBookmarks(idToBookmark)
+	changedBookmarks, removedBookmarks, err := r.GetChangedAndRemovedBookmarks(idToBookmark)
 	if err != nil {
 		return err
 	}
@@ -200,7 +202,7 @@ func (r *Raindrop) PruneBackups() {
 	if r.PruneOlder {
 		r.Logger.Info("Looking for outdated backup files to prune.")
 
-		pattern := fmt.Sprintf("%s/%s", r.Config.ExportDir, "bookmarks-*.yaml")
+		pattern := fmt.Sprintf("%s/%s", r.HomePath, "bookmarks-*.yaml")
 		timePeriod := 1 * Week
 
 		oldFiles, err := util.FindOldFiles(pattern, timePeriod)
@@ -234,10 +236,7 @@ func (r *Raindrop) SaveBookmarks() (err error) {
 	}
 
 	if util.FileExists(r.Config.BookmarksFile) {
-		backupFilename := filepath.Join(
-			r.Config.ExportDir,
-			fmt.Sprintf("bookmarks-%d.yaml", time.Now().Unix()),
-		)
+		backupFilename := filepath.Join(r.HomePath, fmt.Sprintf("bookmarks-%d.yaml", time.Now().Unix()))
 
 		r.Logger.Infof("Copying %s to %s.", r.Config.BookmarksFile, backupFilename)
 		r.Logger.Infof("Saving bookmarks to %s.", r.Config.BookmarksFile)
@@ -248,7 +247,7 @@ func (r *Raindrop) SaveBookmarks() (err error) {
 		}
 	}
 
-	err = os.WriteFile(r.Config.BookmarksFile, yamlBookmarks, 0644)
+	err = os.WriteFile(r.Config.BookmarksFile, yamlBookmarks, 0600)
 	if err != nil {
 		return err
 	}
@@ -274,7 +273,7 @@ func (r *Raindrop) LoadBookmarks() (err error) {
 	return nil
 }
 
-func (r *Raindrop) GetChangedBookmarks(storedBookmarks map[uint64]*data.Bookmark) (changed []*data.Bookmark, removed []uint64, err error) {
+func (r *Raindrop) GetChangedAndRemovedBookmarks(storedBookmarks map[uint64]*data.Bookmark) (changed []*data.Bookmark, removed []uint64, err error) {
 	var raindropBookmarks = make(map[uint64]*data.Bookmark)
 
 	page := 0
