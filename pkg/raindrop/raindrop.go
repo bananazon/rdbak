@@ -120,13 +120,14 @@ func (r *Raindrop) Backup() (err error) {
 	// Download permanent copy where ready and file still missing
 	downloadCount := 0
 	failedIds := make(map[uint64]bool)
-	for _, bm := range changedBookmarks {
-		if bm.Cache.Status != "ready" {
+	for _, bookmark := range changedBookmarks {
+		if bookmark.Cache.Status != "ready" {
 			continue
 		}
-		downloaded, err := r.API.DownloadFileIfMissing(bm.Id, r.Config.ExportDir)
+		downloaded, err := r.API.DownloadFileIfMissing(bookmark.Id, r.Config.ExportDir)
 		if err != nil {
-			failedIds[bm.Id] = true
+			r.Logger.Warn(err.Error())
+			failedIds[bookmark.Id] = true
 		}
 
 		if downloaded {
