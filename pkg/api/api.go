@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -161,7 +161,7 @@ func LimitLength(filename string, maxLen int) string {
 }
 
 func safeDeleteFile(filename string) (err error) {
-	if util.FileExists(filename) {
+	if util.PathExists(filename) {
 		return nil
 	}
 
@@ -172,9 +172,9 @@ func safeDeleteFile(filename string) (err error) {
 	return nil
 }
 
-func (ac *APIClient) getFileName(id uint64, resp *http.Response) string {
+func (ac *APIClient) getFileName(title string, id uint64, resp *http.Response) string {
 	// Baseline: file name is ID
-	filename := fmt.Sprintf("%v", id)
+	filename := fmt.Sprintf("%d", id)
 
 	// Download file name is expected in a header
 	if cdp := resp.Header.Get("Content-Disposition"); cdp != "" {
@@ -197,12 +197,19 @@ func (ac *APIClient) getFileName(id uint64, resp *http.Response) string {
 		}
 	}
 
+	// If filename is NOT in the header, use title
+	if filename == fmt.Sprintf("%d", id) {
+		filename = title
+	}
+
 	// Whee
 	return filename
 }
 
-func (ac *APIClient) DownloadFileIfMissing(id uint64, dir string) (bool, error) {
-	ac.Logger.Infof("Downloading bookmark %d", id)
+func (ac *APIClient) DownloadFileIfMissing(title string, id uint64, exportDir string) (bool, error) {
+	// We need to create a directory for each ID because if two IDs share the same filename,
+	// bad things can happen.
+	ac.Logger.Infof("Downloading bookmark for ID %d", id)
 
 	etc := util.NewExtensibleTimeoutContext(timeoutSec)
 	defer etc.Cancel()
@@ -231,12 +238,18 @@ func (ac *APIClient) DownloadFileIfMissing(id uint64, dir string) (bool, error) 
 		return false, err
 	}
 
-	filename := ac.getFileName(id, resp)
-	filename = path.Join(dir, filename)
+	filename := ac.getFileName(title, id, resp)
+	targetDir := filepath.Join(exportDir, fmt.Sprintf("%d", id))
+	filename = filepath.Join(targetDir, filename)
 
-	if util.FileExists(filename) && util.FileSize(filename) != 0 {
+	if util.PathExists(filename) && util.FileSize(filename) != 0 {
 		ac.Logger.Infof("File exists; skipping: %s", filename)
 		return false, nil
+	}
+
+	err = util.VerifyDirectory(targetDir)
+	if err != nil {
+		return false, err
 	}
 
 	outf, err := os.Create(filename)
@@ -276,7 +289,7 @@ func (ac *APIClient) DownloadFileIfMissing(id uint64, dir string) (bool, error) 
 			return false, err
 		}
 	}
-	ac.Logger.Infof("Download finished: %d bytes\n", savedBytes)
+	ac.Logger.Infof("Download finished: %d bytes", savedBytes)
 
 	return true, nil
 }
