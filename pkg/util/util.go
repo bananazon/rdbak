@@ -57,13 +57,39 @@ func ConfigureLogger(flagNoColor bool, logFileName string) (logger *logrus.Logge
 	return logger
 }
 
-// Return true if the specified file exists and false if it doesn't
-func FileExists(filename string) bool {
-	if _, err := os.Stat(filename); errors.Is(err, os.ErrNotExist) {
+// Return true if the specified path exists and false if it doesn't
+func PathExists(path string) bool {
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 		return false
 	} else {
 		return true
 	}
+}
+
+// Return true if the specified path is a directory and false if it isn't
+func IsDir(path string) bool {
+	if PathExists(path) {
+		info, _ := os.Stat(path)
+		if info.IsDir() {
+			return true
+		}
+	}
+	return false
+}
+
+// Return true if the specified path is writable and false if it isn't
+func IsWritable(path string) bool {
+	if IsDir(path) {
+		tmpFile := "tmpfile"
+		file, err := os.CreateTemp(path, tmpFile)
+		if err != nil {
+			return false
+		}
+		defer os.Remove(file.Name())
+		defer file.Close()
+		return true
+	}
+	return false
 }
 
 // Return true if the specified file size > 0 and false if it isn't
@@ -112,26 +138,21 @@ func GetHome() (homeDir string, err error) {
 	return userObj.HomeDir, nil
 }
 
-func VerifyRdbakHome(path string) error {
-	if info, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		err = os.MkdirAll(path, 0700)
-		if err != nil {
-			return fmt.Errorf("the path %s doesn't exist and couldn't be created: %s", path, err.Error())
-		} else {
-			return fmt.Errorf("the path %s was created, please add a config.yaml file and re-run this utility", path)
-		}
-	} else {
-		if info.IsDir() {
-			tmpFile := "tmpfile"
-			file, err := os.CreateTemp(path, tmpFile)
-			if err != nil {
-				return fmt.Errorf("%s exists and is a directory, but isn't writable", path)
+func VerifyDirectory(path string) error {
+	if PathExists(path) {
+		if IsDir(path) {
+			if IsWritable(path) {
+				return nil
 			}
-			defer os.Remove(file.Name())
-			defer file.Close()
-			return nil
+			return fmt.Errorf("%s exists and is a directory, but isn't writable", path)
 		} else {
 			return fmt.Errorf("%s exists but isn't a directory", path)
 		}
+	} else {
+		err := os.MkdirAll(path, 0700)
+		if err != nil {
+			return fmt.Errorf("the path %s doesn't exist and couldn't be created: %s", path, err.Error())
+		}
+		return nil
 	}
 }
