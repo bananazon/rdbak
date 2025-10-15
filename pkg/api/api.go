@@ -173,7 +173,6 @@ func safeDeleteFile(filename string) (err error) {
 }
 
 func (ac *APIClient) getFileName(id uint64, resp *http.Response) string {
-
 	// Baseline: file name is ID
 	filename := fmt.Sprintf("%v", id)
 
@@ -209,9 +208,10 @@ func (ac *APIClient) DownloadFileIfMissing(id uint64, dir string) (bool, error) 
 	defer etc.Cancel()
 
 	downloadUrl := url.URL{
-		Scheme: "https",
-		Host:   apiBase,
-		Path:   fmt.Sprintf("%s/raindrop/%d/cache?download", apiVersion, id),
+		Scheme:   "https",
+		Host:     apiBase,
+		Path:     fmt.Sprintf("%s/raindrop/%d/cache", apiVersion, id),
+		RawQuery: "download",
 	}
 	url := downloadUrl.String()
 
@@ -244,7 +244,7 @@ func (ac *APIClient) DownloadFileIfMissing(id uint64, dir string) (bool, error) 
 		panic(err)
 	}
 	defer outf.Close()
-	ac.Logger.Infof("Saving %s\n", filename)
+	ac.Logger.Infof("Saving %s", filename)
 
 	buf := make([]byte, 32*1024)
 	savedBytes := 0
