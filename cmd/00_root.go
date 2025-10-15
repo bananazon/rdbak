@@ -40,7 +40,7 @@ func init() {
 
 	rdbakHome = filepath.Join(homeDir, ".config", "rdbak")
 
-	err = util.VerifyRdbakHome(rdbakHome)
+	err = util.VerifyDirectory(rdbakHome)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
