@@ -44,7 +44,7 @@ func Version(prefix, suffix, versionFull bool) string {
 		}
 
 		if !creationTime.IsZero() {
-			version = fmt.Sprintf("%s built %v", version, creationTime.Format("2006-01-02 15:04:05"))
+			version = fmt.Sprintf("%s - built %v", version, creationTime.Format("2006-01-02 15:04:05"))
 		}
 	}
 
