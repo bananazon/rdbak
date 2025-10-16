@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"time"
 
 	"github.com/gdanko/rdbak/pkg/api"
@@ -29,18 +30,18 @@ type Config struct {
 }
 
 type Raindrop struct {
-	API          *api.APIClient
-	Bookmarks    []*data.Bookmark
-	ConfigPath   string
-	Config       *Config
-	HomePath     string
-	Logger       *logrus.Logger
-	NewBookmarks []*data.Bookmark
-	PruneOlder   bool
+	API              *api.APIClient
+	Bookmarks        map[uint64]*data.Bookmark
+	Config           *Config
+	ConfigPath       string
+	HomePath         string
+	Logger           *logrus.Logger
+	PruneOlder       bool
+	UpdatedBookmarks []*data.Bookmark
 }
 
-func New(homePath string, configPath string, pruneOlder bool, logger *logrus.Logger) *Raindrop {
-	return &Raindrop{
+func New(homePath string, configPath string, pruneOlder bool, logger *logrus.Logger) (rd *Raindrop) {
+	rd = &Raindrop{
 		API:        api.NewApiClient(logger),
 		ConfigPath: configPath,
 		Config:     &Config{},
@@ -48,6 +49,9 @@ func New(homePath string, configPath string, pruneOlder bool, logger *logrus.Log
 		Logger:     logger,
 		PruneOlder: pruneOlder,
 	}
+	rd.Bookmarks = make(map[uint64]*data.Bookmark)
+
+	return rd
 }
 
 func (r *Raindrop) ParseConfig() (err error) {
@@ -105,13 +109,8 @@ func (r *Raindrop) Backup() (err error) {
 		return err
 	}
 
-	idToBookmark := make(map[uint64]*data.Bookmark)
-	for _, bm := range r.Bookmarks {
-		idToBookmark[bm.Id] = bm
-	}
-
 	// Get updated and new bookmarks
-	changedBookmarks, removedBookmarks, err := r.GetChangedAndRemovedBookmarks(idToBookmark)
+	newBookmarks, changedBookmarks, removedBookmarks, err := r.GetChangedAndRemovedBookmarks()
 	if err != nil {
 		return err
 	}
@@ -119,11 +118,20 @@ func (r *Raindrop) Backup() (err error) {
 	// Download permanent copy where ready and file still missing
 	downloadCount := 0
 	failedIds := make(map[uint64]bool)
+
+	for _, bookmark := range newBookmarks {
+		downloaded, err := r.API.DownloadFileIfMissing(bookmark.Title, bookmark.Id, r.Config.ExportDir)
+		if err != nil {
+			r.Logger.Warn(err.Error())
+			failedIds[bookmark.Id] = true
+		}
+
+		if downloaded {
+			downloadCount++
+		}
+	}
+
 	for _, bookmark := range changedBookmarks {
-		// I no longer see cache in the JSON output
-		// if bookmark.Cache.Status != "ready" {
-		// 	continue
-		// }
 		downloaded, err := r.API.DownloadFileIfMissing(bookmark.Title, bookmark.Id, r.Config.ExportDir)
 		if err != nil {
 			r.Logger.Warn(err.Error())
@@ -137,14 +145,24 @@ func (r *Raindrop) Backup() (err error) {
 
 	// Marge unchanged bookmarks with changed/new
 	keptIds := make(map[uint64]bool)
-	r.NewBookmarks = make([]*data.Bookmark, 0, len(r.Bookmarks)+len(changedBookmarks))
+	r.UpdatedBookmarks = make([]*data.Bookmark, 0, len(r.Bookmarks)+len(changedBookmarks))
+
+	for _, bookmark := range newBookmarks {
+		if _, exists := failedIds[bookmark.Id]; exists {
+			continue
+		}
+		r.UpdatedBookmarks = append(r.UpdatedBookmarks, bookmark)
+		keptIds[bookmark.Id] = true
+	}
+
 	for _, bookmark := range changedBookmarks {
 		if _, exists := failedIds[bookmark.Id]; exists {
 			continue
 		}
-		r.NewBookmarks = append(r.NewBookmarks, bookmark)
+		r.UpdatedBookmarks = append(r.UpdatedBookmarks, bookmark)
 		keptIds[bookmark.Id] = true
 	}
+
 	for _, bookmark := range r.Bookmarks {
 		if _, exists := failedIds[bookmark.Id]; exists {
 			continue
@@ -154,12 +172,10 @@ func (r *Raindrop) Backup() (err error) {
 			continue
 		}
 
-		_, exists := removedBookmarks[bookmark.Id]
-		if exists {
+		if slices.Contains(removedBookmarks, bookmark.Id) {
 			r.Logger.Info("Skipping!")
 		} else {
-			r.NewBookmarks = append(r.NewBookmarks, bookmark)
-			keptIds[bookmark.Id] = true
+			r.UpdatedBookmarks = append(r.UpdatedBookmarks, bookmark)
 		}
 	}
 
@@ -175,39 +191,45 @@ func (r *Raindrop) Backup() (err error) {
 
 	r.PruneBackups()
 
-	if len(changedBookmarks) > 0 || len(removedBookmarks) > 0 || downloadCount > 0 {
+	if len(newBookmarks) > 0 || len(changedBookmarks) > 0 || len(removedBookmarks) > 0 || downloadCount > 0 {
 		err = r.SaveBookmarks()
 		if err != nil {
 			return err
 		}
-
-		var changedString string = "bookmarks"
-		var fileString string = "files"
-		var removedString = "bookmarks"
-
-		if len(changedBookmarks) == 1 {
-			changedString = "bookmark"
-		}
-
-		if downloadCount == 1 {
-			fileString = "file"
-		}
-
-		if len(removedBookmarks) == 1 {
-			removedString = "bookmark"
-		}
-		r.Logger.Infof(
-			"Finished. %d %s new or changed; %d %s removed; %d new %s downloaded.",
-			len(changedBookmarks),
-			changedString,
-			len(removedBookmarks),
-			removedString,
-			downloadCount,
-			fileString,
-		)
-	} else {
-		r.Logger.Info("No new or changed bookmarks; no removed bookmarks; no new files downloaded.")
 	}
+
+	// Report
+	var changedString string = "bookmarks"
+	var fileString string = "files"
+	var newString string = "bookmarks"
+	var removedString = "bookmarks"
+
+	if len(changedBookmarks) == 1 {
+		changedString = "bookmark"
+	}
+
+	if downloadCount == 1 {
+		fileString = "file"
+	}
+
+	if len(newBookmarks) == 1 {
+		newString = "bookmark"
+	}
+
+	if len(removedBookmarks) == 1 {
+		removedString = "bookmark"
+	}
+	r.Logger.Infof(
+		"Finished. %d new %s; %d changed %s; %d removed %s; %d %s downloaded.",
+		len(newBookmarks),
+		newString,
+		len(changedBookmarks),
+		changedString,
+		len(removedBookmarks),
+		removedString,
+		downloadCount,
+		fileString,
+	)
 
 	return nil
 }
@@ -244,7 +266,7 @@ func (r *Raindrop) PruneBackups() {
 }
 
 func (r *Raindrop) SaveBookmarks() (err error) {
-	yamlBookmarks, err := yaml.Marshal(r.NewBookmarks)
+	yamlBookmarks, err := yaml.Marshal(r.UpdatedBookmarks)
 	if err != nil {
 		return nil
 	}
@@ -270,7 +292,7 @@ func (r *Raindrop) SaveBookmarks() (err error) {
 }
 
 func (r *Raindrop) LoadBookmarks() (err error) {
-	r.Bookmarks = make([]*data.Bookmark, 0)
+	bookmarks := make([]*data.Bookmark, 0)
 
 	if util.PathExists(r.Config.BookmarksFile) {
 		contents, err := os.ReadFile(r.Config.BookmarksFile)
@@ -278,25 +300,28 @@ func (r *Raindrop) LoadBookmarks() (err error) {
 			return err
 		}
 
-		err = yaml.Unmarshal(contents, &r.Bookmarks)
+		err = yaml.Unmarshal(contents, &bookmarks)
 		if err != nil {
 			return err
 		}
 	}
 
+	for _, bookmark := range bookmarks {
+		r.Bookmarks[bookmark.Id] = bookmark
+	}
+
 	return nil
 }
 
-func (r *Raindrop) GetChangedAndRemovedBookmarks(storedBookmarks map[uint64]*data.Bookmark) (changed []*data.Bookmark, removed map[uint64]*data.Bookmark, err error) {
+func (r *Raindrop) GetChangedAndRemovedBookmarks() (new []*data.Bookmark, changed []*data.Bookmark, removed []uint64, err error) {
 	var raindropBookmarks = make(map[uint64]*data.Bookmark)
-	removed = make(map[uint64]*data.Bookmark)
 
 	page := 0
 	// Load all the bookmarks here first
 	for {
 		listResult, err := r.API.ListBookmarks(page)
 		if err != nil {
-			return changed, removed, err
+			return new, changed, removed, err
 		}
 
 		for _, bookmark := range listResult.Items {
@@ -311,23 +336,23 @@ func (r *Raindrop) GetChangedAndRemovedBookmarks(storedBookmarks map[uint64]*dat
 		page += 1
 	}
 
-	// Check for updates
-	for _, bookmarkItem := range raindropBookmarks {
-		storedBookmark, exists := storedBookmarks[bookmarkItem.Id]
+	// Find new and changed bookmarks
+	for _, bookmark := range raindropBookmarks {
+		storedBookmark, exists := r.Bookmarks[bookmark.Id]
 		if !exists {
-			changed = append(changed, bookmarkItem)
-		} else if bookmarkItem.LastUpdate.After(storedBookmark.LastUpdate) {
-			changed = append(changed, bookmarkItem)
+			new = append(new, bookmark)
+		} else if bookmark.LastUpdate.After(storedBookmark.LastUpdate) {
+			changed = append(changed, bookmark)
 		}
 	}
 
 	// See if any need deleting
-	for _, bookmarkItem := range storedBookmarks {
-		_, exists := raindropBookmarks[bookmarkItem.Id]
+	for _, bookmark := range r.Bookmarks {
+		_, exists := raindropBookmarks[bookmark.Id]
 		if !exists {
-			removed[bookmarkItem.Id] = bookmarkItem
+			removed = append(removed, bookmark.Id)
 		}
 	}
 
-	return changed, removed, nil
+	return new, changed, removed, nil
 }
