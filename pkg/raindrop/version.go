@@ -2,13 +2,17 @@ package raindrop
 
 import (
 	"fmt"
+	"os/exec"
 	"runtime"
+	"time"
+
+	"github.com/djherbis/times"
 )
 
 var (
 	Major  = "0"
 	Minor  = "4"
-	Patch  = "1"
+	Patch  = "2"
 	Suffix = "dev"
 )
 
@@ -27,6 +31,21 @@ func Version(prefix, suffix, versionFull bool) string {
 
 	if versionFull {
 		version = fmt.Sprintf("%s-%s-%s", version, runtime.GOOS, runtime.GOARCH)
+
+		var creationTime time.Time
+		path, err := exec.LookPath("rdbak")
+		if err == nil && path != "" {
+			t, err := times.Stat(path)
+			if err == nil {
+				if t.HasBirthTime() {
+					creationTime = t.BirthTime()
+				}
+			}
+		}
+
+		if !creationTime.IsZero() {
+			version = fmt.Sprintf("%s built %v", version, creationTime.Format("2006-01-02 15:04:05"))
+		}
 	}
 
 	return version

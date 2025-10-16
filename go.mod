@@ -3,6 +3,7 @@ module github.com/gdanko/rdbak
 go 1.24.8
 
 require (
+	github.com/djherbis/times v1.6.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.10.1
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
