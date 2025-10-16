@@ -1,6 +1,6 @@
 # Raindrop bookmark backup
 
-`rdbak` is a minimalistic command line tool that downloads a local backup of your [Raindrop.io](https://raindrop.io) and stores them in a YAML file. Note, this is an enhanced version of [rdbak](https://github.com/gugray/rdbak). I crerated this version because the original version lacked some things I wanted, e.g., proper error handling. However, I needed to give credit where it's due.
+`rdbak` is a minimalistic command line tool that downloads a local backup of your [Raindrop.io](https://raindrop.io) and stores them in a YAML file. Note, this is an enhanced version of [rdbak](https://github.com/gugray/rdbak). I created this version because the original version lacked some things I wanted, e.g., proper error handling. However, I needed to give credit where it's due.
 
 ## Differences
 * I'm using the [cobra](https://github.com/spf13/cobra) framework.
