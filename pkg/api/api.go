@@ -254,7 +254,7 @@ func (ac *APIClient) DownloadFileIfMissing(title string, id uint64, exportDir st
 
 	outf, err := os.Create(filename)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 	defer outf.Close()
 	ac.Logger.Infof("Saving %s", filename)
