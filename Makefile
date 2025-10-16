@@ -2,7 +2,7 @@ GOPATH := $(shell go env GOPATH)
 GOOS := $(shell go env GOOS)
 GOARCH := $(shell go env GOARCH)
 GOBIN := $(shell go env GOBIN)
-rdbak_VERSION := "0.4.0"
+rdbak_VERSION := "0.4.1"
 
 GOOS ?= $(shell uname | tr '[:upper:]' '[:lower:]')
 GOARCH ?=$(shell arch)
