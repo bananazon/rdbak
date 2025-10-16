@@ -172,9 +172,7 @@ func (r *Raindrop) Backup() (err error) {
 			continue
 		}
 
-		if slices.Contains(removedBookmarks, bookmark.Id) {
-			r.Logger.Info("Skipping!")
-		} else {
+		if !slices.Contains(removedBookmarks, bookmark.Id) {
 			r.UpdatedBookmarks = append(r.UpdatedBookmarks, bookmark)
 		}
 	}
