@@ -34,3 +34,6 @@ go.work.sum
 # Packeage-specific files
 bin
 *.tgz
+
+# Other crap
+.prettierrc
