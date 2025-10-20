@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/gdanko/rdbak/pkg/raindrop"
 	"github.com/gdanko/rdbak/pkg/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -16,6 +17,7 @@ var (
 	flagPrune    bool
 	homeDir      string
 	logger       *logrus.Logger
+	rd           *raindrop.Raindrop
 	rdbakConfig  string
 	rdbakHome    string
 	rdbakLogfile string
@@ -49,4 +51,10 @@ func init() {
 	rdbakConfig = filepath.Join(rdbakHome, "config.yaml")
 	rdbakLogfile = filepath.Join(rdbakHome, "rdbak.log")
 	logger = util.ConfigureLogger(flagNoColor, rdbakLogfile)
+
+	rd, err = raindrop.New(rdbakHome, rdbakConfig, flagPrune, logger)
+	if err != nil {
+		logger.Error(err)
+		logger.Exit(1)
+	}
 }
