@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/gdanko/rdbak/pkg/raindrop"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +14,6 @@ var (
 		Run:          backupRunCmd,
 		SilenceUsage: false,
 	}
-	rd = raindrop.Raindrop{}
 )
 
 func init() {
@@ -24,16 +22,11 @@ func init() {
 }
 
 func backupPreRunCmd(cmd *cobra.Command, args []string) {
-	rd = *raindrop.New(rdbakHome, rdbakConfig, flagPrune, logger)
-	err = rd.ParseConfig()
-	if err != nil {
-		logger.Error(err)
-		logger.Exit(1)
-	}
+
 }
 
 func backupRunCmd(cmd *cobra.Command, args []string) {
-	err = rd.Backup()
+	err = rd.Backup(flagPrune)
 	if err != nil {
 		logger.Error(err)
 		logger.Exit(1)
