@@ -82,6 +82,7 @@ func (ac *APIClient) Login(email, pass string) error {
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("bad status at login: %d: %s", resp.StatusCode, resp.Status)
 	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
@@ -92,6 +93,7 @@ func (ac *APIClient) Login(email, pass string) error {
 	if err != nil {
 		return err
 	}
+
 	if !loginRes.Result {
 		return fmt.Errorf("Login returned false: %s", loginRes.ErrorMessage)
 	}
