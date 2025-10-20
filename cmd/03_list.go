@@ -3,8 +3,8 @@ package cmd
 import (
 	"os"
 	"strconv"
+	"strings"
 
-	"github.com/gdanko/rdbak/pkg/raindrop"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
@@ -26,11 +26,7 @@ func init() {
 }
 
 func listPreRunCmd(cmd *cobra.Command, args []string) {
-	rd, err = raindrop.New(rdbakHome, rdbakConfig, flagPrune, logger)
-	if err != nil {
-		logger.Error(err)
-		logger.Exit(1)
-	}
+
 }
 
 func listRunCmd(cmd *cobra.Command, args []string) {
@@ -44,11 +40,13 @@ func listRunCmd(cmd *cobra.Command, args []string) {
 	for _, raindrop := range raindrops {
 		tableOut = append(tableOut, []string{
 			strconv.Itoa(int(raindrop.Id)),
+			raindrop.Type,
 			raindrop.Link,
+			strings.Join(raindrop.Tags, ","),
 		})
 	}
 	table := tablewriter.NewWriter(os.Stdout)
-	table.Header([]string{"ID", "Link"})
+	table.Header([]string{"ID", "Type", "Link", "Tags"})
 	table.Bulk(tableOut)
 	table.Render()
 }
