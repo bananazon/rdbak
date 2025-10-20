@@ -53,7 +53,7 @@ type Bookmark struct {
 	Cache        Cache              `json:"cache" yaml:"cache"`
 }
 
-type ListResult struct {
+type ListRaindropsResult struct {
 	Result       bool        `json:"result" yaml:"result"`
 	Items        []*Bookmark `json:"items" yaml:"items"`
 	Count        int         `json:"count" yaml:"count"`
