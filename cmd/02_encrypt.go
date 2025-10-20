@@ -3,7 +3,6 @@ package cmd
 import (
 	"os"
 
-	"github.com/gdanko/rdbak/pkg/raindrop"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -25,12 +24,7 @@ func init() {
 }
 
 func encryptPasswordPreRunCmd(cmd *cobra.Command, args []string) {
-	rd = *raindrop.New(rdbakHome, rdbakConfig, false, logger)
-	err = rd.ParseConfig()
-	if err != nil {
-		logger.Error(err)
-		logger.Exit(1)
-	}
+
 }
 
 func encryptPasswordRunCmd(cmd *cobra.Command, args []string) {
