@@ -26,8 +26,9 @@ const PageSize = 40
 const maxFileNameLen = 128
 const timeoutSec = 60
 
-// const collsUrl = "https://api.raindrop.io/v1/collections"
-// const collsChildrenUrl = "https://api.raindrop.io/v1/collections/childrens"
+// const collectionsChildrenUrl = "https://api.raindrop.io/v1/collections/childrens"
+// const collectionsUrl = "https://api.raindrop.io/v1/collections"
+// const collectionUrl = "https://api.raindrop.io/v1/collection/{id}"
 
 type APIClient struct {
 	Jar            *cookie_jar.CookieJar
@@ -86,7 +87,7 @@ func (ac *APIClient) Login(email, pass string) error {
 		return err
 	}
 
-	var loginRes data.ListResult
+	var loginRes data.ListRaindropsResult
 	err = json.Unmarshal(body, &loginRes)
 	if err != nil {
 		return err
@@ -98,7 +99,7 @@ func (ac *APIClient) Login(email, pass string) error {
 	return nil
 }
 
-func (ac *APIClient) ListBookmarks(page int) (listResult data.ListResult, err error) {
+func (ac *APIClient) ListRaindrops(page int) (listResult data.ListRaindropsResult, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSec*time.Second)
 	defer cancel()
 
