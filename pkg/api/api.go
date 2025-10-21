@@ -27,7 +27,6 @@ const maxFileNameLen = 128
 const timeoutSec = 60
 
 // const collectionsChildrenUrl = "https://api.raindrop.io/v1/collections/childrens"
-// const collectionsUrl = "https://api.raindrop.io/v1/collections"
 // const collectionUrl = "https://api.raindrop.io/v1/collection/{id}"
 
 type APIClient struct {
@@ -101,7 +100,7 @@ func (ac *APIClient) Login(email, pass string) error {
 	return nil
 }
 
-func (ac *APIClient) ListRaindrops(page int) (listResult data.ListRaindropsResult, err error) {
+func (ac *APIClient) ListRaindrops(page int) (listRaindropsResult data.ListRaindropsResult, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSec*time.Second)
 	defer cancel()
 
@@ -114,36 +113,81 @@ func (ac *APIClient) ListRaindrops(page int) (listResult data.ListRaindropsResul
 
 	req, err := http.NewRequestWithContext(ctx, "GET", listUrl.String(), nil)
 	if err != nil {
-		return listResult, err
+		return listRaindropsResult, err
 	}
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("Accept", "application/json")
 
 	resp, err := ac.Client.Do(req)
 	if err != nil {
-		return listResult, err
+		return listRaindropsResult, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return listResult, fmt.Errorf("bad status at list bookmarks: %d: %s", resp.StatusCode, resp.Status)
+		return listRaindropsResult, fmt.Errorf("bad status at list bookmarks: %d: %s", resp.StatusCode, resp.Status)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return listResult, err
+		return listRaindropsResult, err
 	}
 
-	err = json.Unmarshal(body, &listResult)
+	err = json.Unmarshal(body, &listRaindropsResult)
 	if err != nil {
-		return listResult, err
+		return listRaindropsResult, err
 	}
 
-	if !listResult.Result {
-		return listResult, fmt.Errorf("list bookmarks returned false: %s", listResult.ErrorMessage)
+	if !listRaindropsResult.Result {
+		return listRaindropsResult, fmt.Errorf("list bookmarks returned false: %s", listRaindropsResult.ErrorMessage)
 	}
 
-	return listResult, nil
+	return listRaindropsResult, nil
+}
+
+func (ac *APIClient) ListCollections() (listCollectionsResult data.ListCollectionsResult, err error) {
+	// const collectionsUrl = "https://api.raindrop.io/v1/collections"
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSec*time.Second)
+	defer cancel()
+
+	listUrl := url.URL{
+		Scheme: "https",
+		Host:   apiBase,
+		Path:   fmt.Sprintf("%s/collections", apiVersion),
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", listUrl.String(), nil)
+	if err != nil {
+		return listCollectionsResult, err
+	}
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := ac.Client.Do(req)
+	if err != nil {
+		return listCollectionsResult, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return listCollectionsResult, fmt.Errorf("bad status at list bookmarks: %d: %s", resp.StatusCode, resp.Status)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return listCollectionsResult, err
+	}
+
+	err = json.Unmarshal(body, &listCollectionsResult)
+	if err != nil {
+		return listCollectionsResult, err
+	}
+
+	if !listCollectionsResult.Result {
+		return listCollectionsResult, fmt.Errorf("list bookmarks returned false: %s", listCollectionsResult.ErrorMessage)
+	}
+
+	return listCollectionsResult, nil
 }
 
 func LimitLength(filename string, maxLen int) string {
