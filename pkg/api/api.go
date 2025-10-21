@@ -87,14 +87,14 @@ func (ac *APIClient) Login(email, pass string) error {
 		return err
 	}
 
-	var loginRes data.ListRaindropsResult
-	err = json.Unmarshal(body, &loginRes)
+	var loginResult data.LoginResult
+	err = json.Unmarshal(body, &loginResult)
 	if err != nil {
 		return err
 	}
 
-	if !loginRes.Result {
-		return fmt.Errorf("Login returned false: %s", loginRes.ErrorMessage)
+	if !loginResult.Result {
+		return fmt.Errorf("Login returned false: %s", loginResult.ErrorMessage)
 	}
 
 	return nil
