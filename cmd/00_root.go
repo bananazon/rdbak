@@ -14,7 +14,6 @@ import (
 var (
 	err          error
 	flagNoColor  bool
-	flagPrune    bool
 	homeDir      string
 	logger       *logrus.Logger
 	rd           *raindrop.Raindrop

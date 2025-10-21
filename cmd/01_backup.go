@@ -14,6 +14,7 @@ var (
 		Run:          backupRunCmd,
 		SilenceUsage: false,
 	}
+	flagPrune bool
 )
 
 func init() {
