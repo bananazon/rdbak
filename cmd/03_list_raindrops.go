@@ -49,7 +49,6 @@ func listRaindropsRunCmd(cmd *cobra.Command, args []string) {
 	}
 
 	t := table.NewWriter()
-	fmt.Println(flagPageStyle)
 	switch flagPageStyle {
 	case "light":
 		t.SetStyle(table.StyleLight)
