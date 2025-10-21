@@ -7,11 +7,8 @@ import (
 	"slices"
 	"time"
 
-	"github.com/gdanko/rdbak/pkg/api"
-	"github.com/gdanko/rdbak/pkg/crypt"
 	"github.com/gdanko/rdbak/pkg/data"
 	"github.com/gdanko/rdbak/pkg/util"
-	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
@@ -20,92 +17,6 @@ const Minute = time.Minute
 const Hour = time.Hour
 const Day = 24 * time.Hour
 const Week = 7 * Day
-
-type Config struct {
-	Email             string `yaml:"email"`
-	Password          string `yaml:"password,omitempty"`
-	EncryptedPassword string `yaml:"encryptedPassword,omitempty"`
-	BookmarksFile     string `yaml:"bookmarksFile"`
-	ExportDir         string `yaml:"exportDir"`
-}
-
-type Raindrop struct {
-	API              *api.APIClient
-	Collections      map[uint64]*data.Collection
-	Config           *Config
-	ConfigPath       string
-	HomePath         string
-	Logger           *logrus.Logger
-	PruneOlder       bool
-	Raindrops        map[uint64]*data.Bookmark
-	UpdatedRaindrops []*data.Bookmark
-}
-
-func New(homePath string, configPath string, logger *logrus.Logger) (rd *Raindrop, err error) {
-	rd = &Raindrop{
-		API:        api.NewApiClient(logger),
-		ConfigPath: configPath,
-		Config:     &Config{},
-		HomePath:   homePath,
-		Logger:     logger,
-		PruneOlder: false,
-	}
-	rd.Raindrops = make(map[uint64]*data.Bookmark)
-
-	err = rd.ParseConfig()
-	if err != nil {
-		return rd, err
-	}
-
-	err = rd.API.Login(rd.Config.Email, rd.Config.Password)
-	if err != nil {
-		return rd, err
-	}
-
-	return rd, nil
-}
-
-func (r *Raindrop) ParseConfig() (err error) {
-	contents, err := os.ReadFile(r.ConfigPath)
-	if err != nil {
-		return fmt.Errorf("failed to read %s", r.ConfigPath)
-	}
-
-	if err = yaml.Unmarshal(contents, r.Config); err != nil {
-		return fmt.Errorf("failed to parse %s", r.ConfigPath)
-	}
-
-	if len(r.Config.Password) == 0 {
-		if len(r.Config.EncryptedPassword) > 0 {
-			err = r.DecryptPassword()
-			if err != nil {
-				return err
-			}
-		} else {
-			return fmt.Errorf("both password and passwordEncrypted fields in the config are empty; please fix this")
-		}
-	}
-
-	return nil
-}
-
-func (r *Raindrop) EncryptPassword() (err error) {
-	ciphertext, err := crypt.Encrypt(r.Config.Password)
-	if err != nil {
-		return err
-	}
-	r.Config.EncryptedPassword = ciphertext
-	return nil
-}
-
-func (r *Raindrop) DecryptPassword() (err error) {
-	plaintext, err := crypt.Decrypt(r.Config.EncryptedPassword)
-	if err != nil {
-		return err
-	}
-	r.Config.Password = plaintext
-	return nil
-}
 
 func (r *Raindrop) Backup(flagPrune bool) (err error) {
 	r.PruneOlder = flagPrune
@@ -118,7 +29,7 @@ func (r *Raindrop) Backup(flagPrune bool) (err error) {
 	}
 
 	// Get updated and new bookmarks
-	newBookmarks, changedBookmarks, removedBookmarks, err := r.GetChangedAndRemovedBookmarks()
+	newBookmarks, changedBookmarks, removedBookmarks, err := r.GetChanges()
 	if err != nil {
 		return err
 	}
@@ -295,102 +206,4 @@ func (r *Raindrop) SaveBookmarks() (err error) {
 	}
 
 	return nil
-}
-
-func (r *Raindrop) ListRaindrops() (raindrops map[uint64]*data.Bookmark, err error) {
-	raindrops, err = r.getAllBookmarks()
-	if err != nil {
-		return raindrops, err
-	}
-
-	return raindrops, nil
-}
-
-func (r *Raindrop) ListCollections() (collections map[uint64]*data.Collection, err error) {
-	collections = make(map[uint64]*data.Collection)
-
-	listCollectionsResult, err := r.API.ListCollections()
-	if err != nil {
-		return collections, err
-	}
-
-	for _, collection := range listCollectionsResult.Items {
-		collections[collection.Id] = collection
-	}
-
-	return collections, nil
-}
-
-func (r *Raindrop) LoadRaindrops() (err error) {
-	bookmarks := make([]*data.Bookmark, 0)
-
-	if util.PathExists(r.Config.BookmarksFile) {
-		contents, err := os.ReadFile(r.Config.BookmarksFile)
-		if err != nil {
-			return err
-		}
-
-		err = yaml.Unmarshal(contents, &bookmarks)
-		if err != nil {
-			return err
-		}
-	}
-
-	for _, bookmark := range bookmarks {
-		r.Raindrops[bookmark.Id] = bookmark
-	}
-
-	return nil
-}
-
-func (r *Raindrop) getAllBookmarks() (raindrops map[uint64]*data.Bookmark, err error) {
-	raindrops = make(map[uint64]*data.Bookmark)
-	page := 0
-
-	for {
-		listRaindropsResult, err := r.API.ListRaindrops(page)
-		if err != nil {
-			return raindrops, err
-		}
-
-		for _, bookmark := range listRaindropsResult.Items {
-			raindrops[bookmark.Id] = bookmark
-		}
-
-		over := len(listRaindropsResult.Items) < api.PageSize
-
-		if over {
-			break
-		}
-		page += 1
-	}
-
-	return raindrops, nil
-}
-
-func (r *Raindrop) GetChangedAndRemovedBookmarks() (new []*data.Bookmark, changed []*data.Bookmark, removed []uint64, err error) {
-	raindrops, err := r.getAllBookmarks()
-	if err != nil {
-		return new, changed, removed, err
-	}
-
-	// Find new and changed bookmarks
-	for _, bookmark := range raindrops {
-		storedBookmark, exists := r.Raindrops[bookmark.Id]
-		if !exists {
-			new = append(new, bookmark)
-		} else if bookmark.LastUpdate.After(storedBookmark.LastUpdate) {
-			changed = append(changed, bookmark)
-		}
-	}
-
-	// See if any need deleting
-	for _, bookmark := range r.Raindrops {
-		_, exists := raindrops[bookmark.Id]
-		if !exists {
-			removed = append(removed, bookmark.Id)
-		}
-	}
-
-	return new, changed, removed, nil
 }
