@@ -27,7 +27,7 @@ var (
 		Short: "rdbak is a command line utility to backup your raindrop.io bookmarks",
 		Long:  "rdbak is a command line utility to backup your raindrop.io bookmarks",
 	}
-	validStyles = []string{"ascii", "bright", "dark", "lgiht"}
+	validStyles = []string{"ascii", "bright", "dark", "light"}
 	versionFull bool
 )
 
