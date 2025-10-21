@@ -22,6 +22,7 @@ var (
 )
 
 func init() {
+	GetTableFlags(listCollectionsCmd)
 	rootCmd.AddCommand(listCollectionsCmd)
 }
 
@@ -41,9 +42,14 @@ func listCollectionsRunCmd(cmd *cobra.Command, args []string) {
 	}
 
 	t := table.NewWriter()
-	t.SetStyle(table.StyleLight)
+	switch flagPageStyle {
+	case "light":
+		t.SetStyle(table.StyleLight)
+	case "dark":
+		t.SetStyle(table.StyleColoredDark)
+	}
 	// t.SetColumnConfigs([]table.ColumnConfig{{Name: "Description", WidthMax: 80}})
-	t.SetPageSize(40)
+	t.SetPageSize(flagPageSize)
 	t.AppendHeader(table.Row{"ID", "Title", "View", "Description"})
 
 	for _, collection := range collections {

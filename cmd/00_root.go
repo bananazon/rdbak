@@ -12,19 +12,22 @@ import (
 )
 
 var (
-	err          error
-	flagNoColor  bool
-	homeDir      string
-	logger       *logrus.Logger
-	rd           *raindrop.Raindrop
-	rdbakConfig  string
-	rdbakHome    string
-	rdbakLogfile string
-	rootCmd      = &cobra.Command{
+	err           error
+	flagNoColor   bool
+	flagPageSize  int
+	flagPageStyle string
+	homeDir       string
+	logger        *logrus.Logger
+	rd            *raindrop.Raindrop
+	rdbakConfig   string
+	rdbakHome     string
+	rdbakLogfile  string
+	rootCmd       = &cobra.Command{
 		Use:   "rdbak",
 		Short: "rdbak is a command line utility to backup your raindrop.io bookmarks",
 		Long:  "rdbak is a command line utility to backup your raindrop.io bookmarks",
 	}
+	validStyles = []string{"ascii", "light", "dark"}
 	versionFull bool
 )
 

@@ -23,6 +23,7 @@ var (
 )
 
 func init() {
+	GetTableFlags(listRaindropsCmd)
 	rootCmd.AddCommand(listRaindropsCmd)
 }
 
@@ -48,9 +49,15 @@ func listRaindropsRunCmd(cmd *cobra.Command, args []string) {
 	}
 
 	t := table.NewWriter()
-	t.SetStyle(table.StyleLight)
+	fmt.Println(flagPageStyle)
+	switch flagPageStyle {
+	case "light":
+		t.SetStyle(table.StyleLight)
+	case "dark":
+		t.SetStyle(table.StyleColoredDark)
+	}
 	// t.SetColumnConfigs([]table.ColumnConfig{{Name: "Link", WidthMax: 80}})
-	t.SetPageSize(40)
+	t.SetPageSize(flagPageSize)
 	t.AppendHeader(table.Row{"ID", "Collection", "Link", "Tags"})
 
 	for idx, raindrop := range raindrops {
