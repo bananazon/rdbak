@@ -29,6 +29,10 @@ type LinkRef struct {
 	Type string `json:"type" yaml:"type"`
 }
 
+type ReminderRef struct {
+	Date time.Time `json:"date" yaml:"date"`
+}
+
 type UserRef struct {
 	Ref string `json:"$ref" yaml:"$ref"`
 	Id  int64  `json:"$id" yaml:"$id"`
@@ -52,7 +56,7 @@ type ListCollectionsResult struct {
 
 type ListRaindropsResult struct {
 	Result       bool        `json:"result" yaml:"result"`
-	Items        []*Bookmark `json:"items" yaml:"items"`
+	Items        []*Raindrop `json:"items" yaml:"items"`
 	Count        int         `json:"count" yaml:"count"`
 	ErrorMessage string      `json:"errorMessage" yaml:"errorMessage"`
 }
@@ -61,7 +65,7 @@ type ListRaindropsResult struct {
 Raindrop
 */
 
-type Bookmark struct {
+type Raindrop struct {
 	Id           uint64        `json:"_id" yaml:"_id"`
 	Link         string        `json:"link" yaml:"link"`
 	Title        string        `json:"title" yaml:"title"`
@@ -73,6 +77,7 @@ type Bookmark struct {
 	Media        []LinkRef     `json:"media" yaml:"media"`
 	Tags         []string      `json:"tags" yaml:"tags"`
 	Important    bool          `json:"important" yaml:"important"`
+	Reminder     ReminderRef   `json:"reminder" yaml:"reminder"`
 	Removed      bool          `json:"removed" yaml:"removed"`
 	Created      time.Time     `json:"created" yaml:"created"`
 	Collection   CollectionRef `json:"collection" yaml:"collection"`
@@ -107,9 +112,13 @@ type Collection struct {
 	Cover       []string         `json:"cover" yaml:"cover"`
 	Expanded    bool             `json:"expanded" yaml:"expanded"`
 	CreatorRef  CreatorRef       `json:"creatorRef" yaml:"creatorRef"`
+	LastAction  time.Time        `json:"lastAction" yaml:"lastAction"`
+	Created     time.Time        `json:"created" yaml:"created"`
+	LastUpdate  time.Time        `json:"lastUpdate" yaml:"lastUpdate"`
 	Parent      uint64           `json:"parent" yaml:"parent"`
 	Sort        uint64           `json:"sort" yaml:"sort"`
 	Slug        string           `json:"slug" yaml:"slug"`
+	Color       string           `json:"color" yaml:"color"`
 	Access      CollectionAccess `json:"access" yaml:"access"`
 	Author      bool             `json:"author" yaml:"autor"`
 }
