@@ -13,7 +13,6 @@ import (
 )
 
 func (ac *APIClient) ListCollections() (listCollectionsResult data.ListCollectionsResult, err error) {
-	// const collectionsUrl = "https://api.raindrop.io/v1/collections"
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSec*time.Second)
 	defer cancel()
 
