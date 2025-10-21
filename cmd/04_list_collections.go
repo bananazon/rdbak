@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"os"
+	"fmt"
 	"strconv"
 
-	"github.com/olekukonko/tablewriter"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )
 
@@ -29,8 +29,19 @@ func listCollectionsPreRunCmd(cmd *cobra.Command, args []string) {
 }
 
 func listCollectionsRunCmd(cmd *cobra.Command, args []string) {
-	tableOut := [][]string{}
-	for _, collection := range rd.Collections {
+	collections, err := rd.ListCollections()
+	if err != nil {
+		logger.Error(err)
+		logger.Exit(1)
+	}
+
+	t := table.NewWriter()
+	t.SetStyle(table.StyleLight)
+	// t.SetColumnConfigs([]table.ColumnConfig{{Name: "Description", WidthMax: 80}})
+	t.SetPageSize(40)
+	t.AppendHeader(table.Row{"ID", "Title", "View", "Description"})
+
+	for _, collection := range collections {
 		var description string
 
 		if collection.Description == "" {
@@ -38,16 +49,13 @@ func listCollectionsRunCmd(cmd *cobra.Command, args []string) {
 		} else {
 			description = collection.Description
 		}
-
-		tableOut = append(tableOut, []string{
+		t.AppendRow(table.Row{
 			strconv.Itoa(int(collection.Id)),
 			collection.Title,
 			collection.View,
 			description,
 		})
 	}
-	table := tablewriter.NewWriter(os.Stdout)
-	table.Header([]string{"ID", "Title", "View", "Description"})
-	table.Bulk(tableOut)
-	table.Render()
+
+	fmt.Println(t.Render())
 }
