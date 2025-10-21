@@ -6,51 +6,48 @@ type Cache struct {
 	Status string `json:"status" yaml:"status"`
 }
 
-type RaindropCollection struct {
-	Ref string `json:"$ref" yaml:"$ref"`
-	Id  int64  `json:"$id" yaml:"$id"`
-	Oid int64  `json:"oid" yaml:"oid"`
+/*
+Refs
+*/
+
+type CollectionRef struct {
+	Ref  string `json:"$ref" yaml:"$ref"`
+	Id   int64  `json:"$id" yaml:"$id"`
+	Oid  int64  `json:"oid" yaml:"oid"`
+	Name string `json:"name" yaml:"name"`
 }
 
-type RaindropCreatorRef struct {
+type CreatorRef struct {
 	Id     int64  `json:"_id" yaml:"_id"`
 	Avatar string `json:"avatar" yaml:"avatar"`
 	Name   string `json:"name" yaml:"name"`
 	Email  string `email:"link" yaml:"email"`
 }
 
-type RaindropLink struct {
+type LinkRef struct {
 	Link string `json:"link" yaml:"link"`
 	Type string `json:"type" yaml:"type"`
 }
 
-type RaindropUser struct {
+type UserRef struct {
 	Ref string `json:"$ref" yaml:"$ref"`
 	Id  int64  `json:"$id" yaml:"$id"`
 }
 
-type Bookmark struct {
-	Id           uint64             `json:"_id" yaml:"_id"`
-	Link         string             `json:"link" yaml:"link"`
-	Title        string             `json:"title" yaml:"title"`
-	Excerpt      string             `json:"excerpt" yaml:"excerpt"`
-	Note         string             `json:"note" yaml:"note"`
-	Type         string             `json:"type" yaml:"type"`
-	User         RaindropUser       `json:"user" yaml:"user"`
-	Cover        string             `json:"cover" yaml:"cover"`
-	Media        []RaindropLink     `json:"media" yaml:"media"`
-	Tags         []string           `json:"tags" yaml:"tags"`
-	Important    bool               `json:"important" yaml:"important"`
-	Removed      bool               `json:"removed" yaml:"removed"`
-	Created      time.Time          `json:"created" yaml:"created"`
-	Collection   RaindropCollection `json:"collection" yaml:"collection"`
-	Highlights   []any              `json:"highlights" yaml:"highlights"`
-	LastUpdate   time.Time          `json:"lastUpdate" yaml:"lastUpdate"`
-	Domain       string             `json:"domain" yaml:"domain"`
-	CreatorRef   RaindropCreatorRef `json:"creatorRef" yaml:"creatorRef"`
-	Sort         int64              `json:"sort" yaml:"sort"`
-	CollectionId int64              `json:"collectionId" yaml:"collectionId"`
-	Cache        Cache              `json:"cache" yaml:"cache"`
+/*
+Results
+*/
+
+type LoginResult struct {
+	Result       bool   `json:"result" yaml:"result"`
+	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+}
+
+type ListCollectionsResult struct {
+	Result       bool          `json:"result" yaml:"result"`
+	Items        []*Collection `json:"items" yaml:"items"`
+	Count        int           `json:"count" yaml:"count"`
+	ErrorMessage string        `json:"errorMessage" yaml:"errorMessage"`
 }
 
 type ListRaindropsResult struct {
@@ -60,7 +57,59 @@ type ListRaindropsResult struct {
 	ErrorMessage string      `json:"errorMessage" yaml:"errorMessage"`
 }
 
-type LoginResult struct {
-	Result       bool   `json:"result" yaml:"result"`
-	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+/*
+Raindrop
+*/
+
+type Bookmark struct {
+	Id           uint64        `json:"_id" yaml:"_id"`
+	Link         string        `json:"link" yaml:"link"`
+	Title        string        `json:"title" yaml:"title"`
+	Excerpt      string        `json:"excerpt" yaml:"excerpt"`
+	Note         string        `json:"note" yaml:"note"`
+	Type         string        `json:"type" yaml:"type"`
+	User         UserRef       `json:"user" yaml:"user"`
+	Cover        string        `json:"cover" yaml:"cover"`
+	Media        []LinkRef     `json:"media" yaml:"media"`
+	Tags         []string      `json:"tags" yaml:"tags"`
+	Important    bool          `json:"important" yaml:"important"`
+	Removed      bool          `json:"removed" yaml:"removed"`
+	Created      time.Time     `json:"created" yaml:"created"`
+	Collection   CollectionRef `json:"collection" yaml:"collection"`
+	Highlights   []any         `json:"highlights" yaml:"highlights"`
+	LastUpdate   time.Time     `json:"lastUpdate" yaml:"lastUpdate"`
+	Domain       string        `json:"domain" yaml:"domain"`
+	CreatorRef   CreatorRef    `json:"creatorRef" yaml:"creatorRef"`
+	Sort         int64         `json:"sort" yaml:"sort"`
+	CollectionId int64         `json:"collectionId" yaml:"collectionId"`
+	Cache        Cache         `json:"cache" yaml:"cache"`
+}
+
+/*
+Collection
+*/
+
+type CollectionAccess struct {
+	For       uint64 `json:"for" yaml:"for"`
+	Level     int    `json:"level" yaml:"level"`
+	Root      bool   `json:"root" yaml:"root"`
+	Draggable bool   `json:"draggable" yaml:"draggable"`
+}
+
+type Collection struct {
+	Id          uint64           `json:"_id" yaml:"_id"`
+	Title       string           `json:"title" yaml:"title"`
+	Description string           `json:"description" yaml:"description"`
+	User        UserRef          `json:"user" yaml:"user"`
+	Public      bool             `json:"public" yaml:"public"`
+	View        string           `json:"view" yaml:"view"`
+	Count       uint64           `json:"count" yaml:"count"`
+	Cover       []string         `json:"cover" yaml:"cover"`
+	Expanded    bool             `json:"expanded" yaml:"expanded"`
+	CreatorRef  CreatorRef       `json:"creatorRef" yaml:"creatorRef"`
+	Parent      uint64           `json:"parent" yaml:"parent"`
+	Sort        uint64           `json:"sort" yaml:"sort"`
+	Slug        string           `json:"slug" yaml:"slug"`
+	Access      CollectionAccess `json:"access" yaml:"access"`
+	Author      bool             `json:"author" yaml:"autor"`
 }

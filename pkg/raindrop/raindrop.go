@@ -31,6 +31,7 @@ type Config struct {
 
 type Raindrop struct {
 	API              *api.APIClient
+	Collections      map[uint64]*data.Collection
 	Config           *Config
 	ConfigPath       string
 	HomePath         string
@@ -111,7 +112,7 @@ func (r *Raindrop) Backup(flagPrune bool) (err error) {
 
 	r.Logger.Info("Starting bookmarks backup.")
 
-	err = r.LoadBookmarks()
+	err = r.LoadRaindrops()
 	if err != nil {
 		return err
 	}
@@ -296,7 +297,7 @@ func (r *Raindrop) SaveBookmarks() (err error) {
 	return nil
 }
 
-func (r *Raindrop) List() (raindrops map[uint64]*data.Bookmark, err error) {
+func (r *Raindrop) ListRaindrops() (raindrops map[uint64]*data.Bookmark, err error) {
 	raindrops, err = r.getAllBookmarks()
 	if err != nil {
 		return raindrops, err
@@ -305,7 +306,22 @@ func (r *Raindrop) List() (raindrops map[uint64]*data.Bookmark, err error) {
 	return raindrops, nil
 }
 
-func (r *Raindrop) LoadBookmarks() (err error) {
+func (r *Raindrop) ListCollections() (collections map[uint64]*data.Collection, err error) {
+	collections = make(map[uint64]*data.Collection)
+
+	listCollectionsResult, err := r.API.ListCollections()
+	if err != nil {
+		return collections, err
+	}
+
+	for _, collection := range listCollectionsResult.Items {
+		collections[collection.Id] = collection
+	}
+
+	return collections, nil
+}
+
+func (r *Raindrop) LoadRaindrops() (err error) {
 	bookmarks := make([]*data.Bookmark, 0)
 
 	if util.PathExists(r.Config.BookmarksFile) {
@@ -332,16 +348,16 @@ func (r *Raindrop) getAllBookmarks() (raindrops map[uint64]*data.Bookmark, err e
 	page := 0
 
 	for {
-		listResult, err := r.API.ListRaindrops(page)
+		listRaindropsResult, err := r.API.ListRaindrops(page)
 		if err != nil {
 			return raindrops, err
 		}
 
-		for _, bookmark := range listResult.Items {
+		for _, bookmark := range listRaindropsResult.Items {
 			raindrops[bookmark.Id] = bookmark
 		}
 
-		over := len(listResult.Items) < api.PageSize
+		over := len(listRaindropsResult.Items) < api.PageSize
 
 		if over {
 			break
