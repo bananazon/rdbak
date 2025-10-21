@@ -48,6 +48,7 @@ func New(homePath string, configPath string, logger *logrus.Logger) (rd *Raindro
 		Config:     &Config{},
 		HomePath:   homePath,
 		Logger:     logger,
+		PruneOlder: false,
 	}
 	rd.Raindrops = make(map[uint64]*data.Bookmark)
 
