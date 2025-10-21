@@ -12,7 +12,7 @@ import (
 var (
 	Major  = "0"
 	Minor  = "4"
-	Patch  = "5"
+	Patch  = "6"
 	Suffix = "dev"
 )
 
