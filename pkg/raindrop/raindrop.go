@@ -41,14 +41,13 @@ type Raindrop struct {
 	UpdatedRaindrops []*data.Bookmark
 }
 
-func New(homePath string, configPath string, pruneOlder bool, logger *logrus.Logger) (rd *Raindrop, err error) {
+func New(homePath string, configPath string, logger *logrus.Logger) (rd *Raindrop, err error) {
 	rd = &Raindrop{
 		API:        api.NewApiClient(logger),
 		ConfigPath: configPath,
 		Config:     &Config{},
 		HomePath:   homePath,
 		Logger:     logger,
-		PruneOlder: pruneOlder,
 	}
 	rd.Raindrops = make(map[uint64]*data.Bookmark)
 
