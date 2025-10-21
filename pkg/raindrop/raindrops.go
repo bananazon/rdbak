@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func (r *Raindrop) ListRaindrops() (raindrops map[uint64]*data.Bookmark, err error) {
+func (r *Raindrop) ListRaindrops() (raindrops map[uint64]*data.Raindrop, err error) {
 	raindrops, err = r.getAllRaindrops()
 	if err != nil {
 		return raindrops, err
@@ -19,7 +19,7 @@ func (r *Raindrop) ListRaindrops() (raindrops map[uint64]*data.Bookmark, err err
 }
 
 func (r *Raindrop) LoadRaindrops() (err error) {
-	bookmarks := make([]*data.Bookmark, 0)
+	bookmarks := make([]*data.Raindrop, 0)
 
 	if util.PathExists(r.Config.BookmarksFile) {
 		contents, err := os.ReadFile(r.Config.BookmarksFile)
@@ -40,7 +40,7 @@ func (r *Raindrop) LoadRaindrops() (err error) {
 	return nil
 }
 
-func (r *Raindrop) GetChanges() (new []*data.Bookmark, changed []*data.Bookmark, removed []uint64, err error) {
+func (r *Raindrop) GetChanges() (new []*data.Raindrop, changed []*data.Raindrop, removed []uint64, err error) {
 	raindrops, err := r.getAllRaindrops()
 	if err != nil {
 		return new, changed, removed, err
@@ -67,8 +67,8 @@ func (r *Raindrop) GetChanges() (new []*data.Bookmark, changed []*data.Bookmark,
 	return new, changed, removed, nil
 }
 
-func (r *Raindrop) getAllRaindrops() (raindrops map[uint64]*data.Bookmark, err error) {
-	raindrops = make(map[uint64]*data.Bookmark)
+func (r *Raindrop) getAllRaindrops() (raindrops map[uint64]*data.Raindrop, err error) {
+	raindrops = make(map[uint64]*data.Raindrop)
 	page := 0
 
 	for {

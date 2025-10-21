@@ -64,7 +64,7 @@ func (r *Raindrop) Backup(flagPrune bool) (err error) {
 
 	// Marge unchanged bookmarks with changed/new
 	keptIds := make(map[uint64]bool)
-	r.UpdatedRaindrops = make([]*data.Bookmark, 0, len(r.Raindrops)+len(changedBookmarks))
+	r.UpdatedRaindrops = make([]*data.Raindrop, 0, len(r.Raindrops)+len(changedBookmarks))
 
 	for _, bookmark := range newBookmarks {
 		if _, exists := failedIds[bookmark.Id]; exists {

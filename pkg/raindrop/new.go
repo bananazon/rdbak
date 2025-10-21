@@ -26,8 +26,8 @@ type Raindrop struct {
 	HomePath         string
 	Logger           *logrus.Logger
 	PruneOlder       bool
-	Raindrops        map[uint64]*data.Bookmark
-	UpdatedRaindrops []*data.Bookmark
+	Raindrops        map[uint64]*data.Raindrop
+	UpdatedRaindrops []*data.Raindrop
 }
 
 func New(homePath string, configPath string, logger *logrus.Logger) (rd *Raindrop, err error) {
@@ -39,7 +39,7 @@ func New(homePath string, configPath string, logger *logrus.Logger) (rd *Raindro
 		Logger:     logger,
 		PruneOlder: false,
 	}
-	rd.Raindrops = make(map[uint64]*data.Bookmark)
+	rd.Raindrops = make(map[uint64]*data.Raindrop)
 
 	err = rd.ParseConfig()
 	if err != nil {
