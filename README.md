@@ -23,6 +23,9 @@
 * `rdbak encrypt-password`
 * `rdbak backup`
 
+## Available Command
+Run `rdbak` by itself for a list of available commands. Run `rdbak <command> --help` for command-specific help, including command aliases.
+
 ## crontab
 I run it every five minutes
 ```
