@@ -50,10 +50,4 @@ func init() {
 	rdbakConfig = filepath.Join(rdbakHome, "config.yaml")
 	rdbakLogfile = filepath.Join(rdbakHome, "rdbak.log")
 	logger = util.ConfigureLogger(flagNoColor, rdbakLogfile)
-
-	rd, err = raindrop.New(rdbakHome, rdbakConfig, flagPrune, logger)
-	if err != nil {
-		logger.Error(err)
-		logger.Exit(1)
-	}
 }

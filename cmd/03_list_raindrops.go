@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gdanko/rdbak/pkg/raindrop"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )
@@ -26,7 +27,11 @@ func init() {
 }
 
 func listRaindropsPreRunCmd(cmd *cobra.Command, args []string) {
-
+	rd, err = raindrop.New(rdbakHome, rdbakConfig, flagPrune, logger)
+	if err != nil {
+		logger.Error(err)
+		logger.Exit(1)
+	}
 }
 
 func listRaindropsRunCmd(cmd *cobra.Command, args []string) {
