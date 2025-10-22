@@ -48,22 +48,8 @@ func listRaindropsRunCmd(cmd *cobra.Command, args []string) {
 		logger.Exit(1)
 	}
 
-	t := table.NewWriter()
-	switch flagPageStyle {
-	case "bright":
-		t.SetStyle(table.StyleColoredBright)
-	case "dark":
-		t.SetStyle(table.StyleColoredCyanWhiteOnBlack)
-	case "light":
-		t.SetStyle(table.StyleLight)
-	}
-
-	// t.SetColumnConfigs([]table.ColumnConfig{{Name: "Link", WidthMax: 80}})
-	t.SortBy([]table.SortBy{
-		{Name: "Collection", Mode: table.Asc},
-		{Name: "Link", Mode: table.Asc},
-	})
-	t.SetPageSize(flagPageSize)
+	t := GetTableTemplate("Raindrops")
+	t.SortBy([]table.SortBy{{Name: "Collection", Mode: table.Asc}, {Name: "Link", Mode: table.Asc}})
 	t.AppendHeader(table.Row{"ID", "Collection", "Link", "Tags"})
 
 	for idx, raindrop := range raindrops {

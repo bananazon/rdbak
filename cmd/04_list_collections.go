@@ -42,24 +42,9 @@ func listCollectionsRunCmd(cmd *cobra.Command, args []string) {
 		logger.Exit(1)
 	}
 
-	t := table.NewWriter()
-	switch flagPageStyle {
-	case "bright":
-		t.SetStyle(table.StyleColoredBright)
-	case "dark":
-		t.SetStyle(table.StyleColoredCyanWhiteOnBlack)
-	case "light":
-		t.SetStyle(table.StyleLight)
-	}
-
-	// t.SetColumnConfigs([]table.ColumnConfig{{Name: "Description", WidthMax: 80}})
-	t.SortBy([]table.SortBy{
-		{Name: "Title", Mode: table.Asc},
-	})
-	t.SetColumnConfigs([]table.ColumnConfig{
-		{Name: "Count", Align: text.AlignLeft},
-	})
-	t.SetPageSize(flagPageSize)
+	t := GetTableTemplate("Collections")
+	t.SortBy([]table.SortBy{{Name: "Title", Mode: table.Asc}})
+	t.SetColumnConfigs([]table.ColumnConfig{{Name: "Count", Align: text.AlignLeft}})
 	t.AppendHeader(table.Row{"ID", "Title", "View", "Description", "Count"})
 
 	for _, collection := range collections {
