@@ -64,6 +64,10 @@ func (r *Raindrop) ParseConfig() (err error) {
 		return fmt.Errorf("failed to parse %s", r.ConfigPath)
 	}
 
+	if len(r.Config.BookmarksFile) == 0 {
+		return fmt.Errorf("the bookmarksFile field in the config is empty; please fix this")
+	}
+
 	if len(r.Config.Password) == 0 {
 		if len(r.Config.EncryptedPassword) > 0 {
 			err = r.DecryptPassword()
