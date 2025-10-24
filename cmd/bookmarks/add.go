@@ -1,4 +1,4 @@
-package raindrops
+package bookmarks
 
 import (
 	"github.com/bananazon/raindrop/pkg/context"
@@ -6,11 +6,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newAddRaindropCmd(ctx *context.AppContext) (c *cobra.Command) {
+func newAddBookmarkCmd(ctx *context.AppContext) (c *cobra.Command) {
 	c = &cobra.Command{
 		Use:     "add",
 		Aliases: []string{"a"},
-		Short:   "Add a new raindrop to your raindrop.io account",
+		Short:   "Add a new bookmark to your raindrop.io account",
 		PreRunE: func(cmdC *cobra.Command, args []string) error {
 			rd, err := raindrop.New(ctx.RaindropHome, ctx.RaindropConfig, ctx.Logger)
 			if err != nil {
@@ -21,21 +21,21 @@ func newAddRaindropCmd(ctx *context.AppContext) (c *cobra.Command) {
 			return nil
 		},
 		RunE: func(cmdC *cobra.Command, args []string) error {
-			_, err := ctx.RD.API.AddRaindrop(
-				ctx.FlagAddRaindropLink,
-				ctx.FlagAddRaindropTitle,
-				int64(ctx.FlagAddRaindropCollectionId),
+			_, err := ctx.RD.API.AddBookmark(
+				ctx.FlagAddBookmarkLink,
+				ctx.FlagAddBookmarkTitle,
+				int64(ctx.FlagAddBookmarkCollectionId),
 			)
 			if err != nil {
-				ctx.Logger.Println("AddRaindrop failed:", err)
+				ctx.Logger.Println("Failed to add the bookmark:", err)
 				return err
 			}
-			ctx.Logger.Println("Raindrop added successfully.")
+			ctx.Logger.Println("Bookmark added successfully.")
 			return nil
 		},
 	}
 
-	ctx.GetAddRaindropFlags(c)
+	ctx.GetAddBookmarkFlags(c)
 
 	return c
 }
@@ -66,7 +66,7 @@ func newAddRaindropCmd(ctx *context.AppContext) (c *cobra.Command) {
 // }
 
 // func addRaindropRunCmd(cmdC *cobra.Command, args []string) {
-// 	_, err := cmd.RD.API.AddRaindrop(cmd.FlagAddRaindropLink, cmd.FlagAddRaindropTitle, int64(cmd.FlagAddRaindropCollectionId))
+// 	_, err := cmd.RD.API.AddRaindrop(cmd.FlagAddBookmarkLink, cmd.FlagAddBookmarkTitle, int64(cmd.FlagAddBookmarkCollectionId))
 // 	if err != nil {
 // 		cmd.Logger.Error(err)
 // 		cmd.Logger.Exit(1)

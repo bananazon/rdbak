@@ -23,7 +23,7 @@ func (r *Raindrop) Backup(flagPrune bool) (err error) {
 
 	r.Logger.Info("Starting bookmarks backup.")
 
-	err = r.LoadRaindrops()
+	err = r.LoadBookmarks()
 	if err != nil {
 		return err
 	}
@@ -64,13 +64,13 @@ func (r *Raindrop) Backup(flagPrune bool) (err error) {
 
 	// Marge unchanged bookmarks with changed/new
 	keptIds := make(map[uint64]bool)
-	r.UpdatedRaindrops = make([]*data.Raindrop, 0, len(r.Raindrops)+len(changedBookmarks))
+	r.UpdatedBookmarks = make([]*data.Bookmark, 0, len(r.Bookmarks)+len(changedBookmarks))
 
 	for _, bookmark := range newBookmarks {
 		if _, exists := failedIds[bookmark.Id]; exists {
 			continue
 		}
-		r.UpdatedRaindrops = append(r.UpdatedRaindrops, bookmark)
+		r.UpdatedBookmarks = append(r.UpdatedBookmarks, bookmark)
 		keptIds[bookmark.Id] = true
 	}
 
@@ -78,11 +78,11 @@ func (r *Raindrop) Backup(flagPrune bool) (err error) {
 		if _, exists := failedIds[bookmark.Id]; exists {
 			continue
 		}
-		r.UpdatedRaindrops = append(r.UpdatedRaindrops, bookmark)
+		r.UpdatedBookmarks = append(r.UpdatedBookmarks, bookmark)
 		keptIds[bookmark.Id] = true
 	}
 
-	for _, bookmark := range r.Raindrops {
+	for _, bookmark := range r.Bookmarks {
 		if _, exists := failedIds[bookmark.Id]; exists {
 			continue
 		}
@@ -92,7 +92,7 @@ func (r *Raindrop) Backup(flagPrune bool) (err error) {
 		}
 
 		if !slices.Contains(removedBookmarks, bookmark.Id) {
-			r.UpdatedRaindrops = append(r.UpdatedRaindrops, bookmark)
+			r.UpdatedBookmarks = append(r.UpdatedBookmarks, bookmark)
 		}
 	}
 
@@ -183,7 +183,7 @@ func (r *Raindrop) PruneBackups() {
 }
 
 func (r *Raindrop) SaveBookmarks() (err error) {
-	yamlBookmarks, err := yaml.Marshal(r.UpdatedRaindrops)
+	yamlBookmarks, err := yaml.Marshal(r.UpdatedBookmarks)
 	if err != nil {
 		return nil
 	}

@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/bananazon/raindrop/cmd/bookmarks"
 	"github.com/bananazon/raindrop/cmd/collections"
-	"github.com/bananazon/raindrop/cmd/raindrops"
 	"github.com/bananazon/raindrop/pkg/context"
 	"github.com/bananazon/raindrop/pkg/raindrop"
 	"github.com/bananazon/raindrop/pkg/util"
@@ -63,5 +63,5 @@ func init() {
 	}
 
 	RootCmd.AddCommand(collections.NewCollectionsCmd(ctx))
-	RootCmd.AddCommand(raindrops.NewRaindropsCmd(ctx))
+	RootCmd.AddCommand(bookmarks.NewBookmarksCmd(ctx))
 }

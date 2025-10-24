@@ -47,19 +47,19 @@ type LoginResult struct {
 	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
 }
 
-type AddRaindropResult struct {
+type AddBookmarkResult struct {
 	Result       bool     `json:"result" yaml:"result"`
 	ErrorMessage string   `json:"errorMessage" yaml:"errorMessage"`
-	Item         Raindrop `json:"item" yaml:"item"`
+	Item         Bookmark `json:"item" yaml:"item"`
 }
 
-type ListRaindropsResult struct {
+type ListBookmarksResult struct {
 	Result       bool        `json:"result" yaml:"result"`
-	Items        []*Raindrop `json:"items" yaml:"items"`
+	Items        []*Bookmark `json:"items" yaml:"items"`
 	Count        int         `json:"count" yaml:"count"`
 	ErrorMessage string      `json:"errorMessage" yaml:"errorMessage"`
 }
-type RemoveRaindropResult struct {
+type RemoveBookmarkResult struct {
 	Result       bool   `json:"result" yaml:"result"`
 	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
 }
@@ -90,7 +90,7 @@ type SortCollectionsResult struct {
 Raindrop
 */
 
-type Raindrop struct {
+type Bookmark struct {
 	Id           uint64        `json:"_id" yaml:"_id"`
 	Link         string        `json:"link" yaml:"link"`
 	Title        string        `json:"title" yaml:"title"`

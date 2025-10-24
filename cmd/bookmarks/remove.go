@@ -1,0 +1,39 @@
+package bookmarks
+
+import (
+	"github.com/bananazon/raindrop/pkg/context"
+	"github.com/bananazon/raindrop/pkg/raindrop"
+	"github.com/spf13/cobra"
+)
+
+func newRemoveBookmarkCmd(ctx *context.AppContext) (c *cobra.Command) {
+	c = &cobra.Command{
+		Use:     "remove",
+		Aliases: []string{"r"},
+		Short:   "Remove an existing bookmark from your raindrop.io account",
+		PreRunE: func(cmdC *cobra.Command, args []string) error {
+			rd, err := raindrop.New(ctx.RaindropHome, ctx.RaindropConfig, ctx.Logger)
+			if err != nil {
+				ctx.Logger.Println("Failed to initialize raindrop:", err)
+				return err
+			}
+			ctx.RD = rd
+			return nil
+		},
+		RunE: func(cmdC *cobra.Command, args []string) error {
+			_, err := ctx.RD.API.RemoveBookmark(
+				ctx.FlagRemoveBookmarkId,
+			)
+			if err != nil {
+				ctx.Logger.Println("Failed to remove the bookmark:", err)
+				return err
+			}
+			ctx.Logger.Println("Bookmark removed successfully.")
+			return nil
+		},
+	}
+
+	ctx.GetRemoveBookmarkFlags(c)
+
+	return c
+}
