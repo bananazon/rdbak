@@ -1,11 +1,11 @@
-package cmd
+package table
 
 import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-func GetTableTemplate(title string) (t table.Writer) {
+func GetTableTemplate(title string, flagPageSize int, flagPageStyle string) (t table.Writer) {
 	t = table.NewWriter()
 	t.SetTitle(title)
 

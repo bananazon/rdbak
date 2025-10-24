@@ -20,7 +20,7 @@ var (
 )
 
 func init() {
-	rootCmd.AddCommand(encryptPasswordCmd)
+	RootCmd.AddCommand(encryptPasswordCmd)
 }
 
 func encryptPasswordPreRunCmd(cmd *cobra.Command, args []string) {
@@ -28,33 +28,33 @@ func encryptPasswordPreRunCmd(cmd *cobra.Command, args []string) {
 }
 
 func encryptPasswordRunCmd(cmd *cobra.Command, args []string) {
-	if len(rd.Config.Password) == 0 {
-		logger.Error("config has no plaintext password")
-		logger.Exit(1)
+	if len(RD.Config.Password) == 0 {
+		Logger.Error("config has no plaintext password")
+		Logger.Exit(1)
 	}
 
-	if len(rd.Config.EncryptedPassword) > 0 {
-		logger.Info("config already has an encrypted password")
-		logger.Exit(0)
+	if len(RD.Config.EncryptedPassword) > 0 {
+		Logger.Info("config already has an encrypted password")
+		Logger.Exit(0)
 	}
 
-	err = rd.EncryptPassword()
+	err = RD.EncryptPassword()
 	if err != nil {
-		logger.Error(err)
-		logger.Exit(1)
+		Logger.Error(err)
+		Logger.Exit(1)
 	}
 
-	rd.Config.Password = ""
+	RD.Config.Password = ""
 
-	configBytes, err := yaml.Marshal(&rd.Config)
+	configBytes, err := yaml.Marshal(&RD.Config)
 	if err != nil {
-		logger.Error(err)
-		logger.Exit(1)
+		Logger.Error(err)
+		Logger.Exit(1)
 	}
 
-	err = os.WriteFile(rd.ConfigPath, configBytes, 0600)
+	err = os.WriteFile(RD.ConfigPath, configBytes, 0600)
 	if err != nil {
-		logger.Error(err)
-		logger.Exit(1)
+		Logger.Error(err)
+		Logger.Exit(1)
 	}
 }

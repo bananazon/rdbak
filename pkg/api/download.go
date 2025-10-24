@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gdanko/rdbak/pkg/util"
+	"github.com/bananazon/rdbak/pkg/util"
 )
 
 func (ac *APIClient) DownloadFileIfMissing(title string, id uint64, exportDir string) (bool, error) {

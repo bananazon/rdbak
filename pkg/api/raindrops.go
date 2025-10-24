@@ -1,58 +1,93 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"net/url"
-	"time"
+	"strconv"
 
-	"github.com/gdanko/rdbak/pkg/data"
+	"github.com/bananazon/rdbak/pkg/data"
 )
 
-func (ac *APIClient) ListRaindrops(page int) (listRaindropsResult data.ListRaindropsResult, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSec*time.Second)
-	defer cancel()
-
-	listUrl := url.URL{
-		Scheme:   "https",
-		Host:     apiBase,
-		Path:     fmt.Sprintf("%s/raindrops/0", apiVersion),
-		RawQuery: fmt.Sprintf("sort=-lastUpdate&perpage=%d&page=%d&version=2", PageSize, page),
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "GET", listUrl.String(), nil)
+func (ac *APIClient) AddRaindrop(link string, title string, collectionId int64) (data.AddRaindropResult, error) {
+	var (
+		addRaindropResult data.AddRaindropResult
+		addUrl            url.URL
+		err               error
+		response          APIResponse
+	)
+	jsonBody := map[string]string{"link": link, "title": title, "collectionId": strconv.FormatInt(collectionId, 10)}
+	jsonStr, err := json.Marshal(&jsonBody)
 	if err != nil {
-		return listRaindropsResult, err
+		return addRaindropResult, err
 	}
-	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-	req.Header.Set("Accept", "application/json")
 
-	resp, err := ac.Client.Do(req)
+	addUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/raindrop", apiVersion)}
+	response = ac.Request(APIRequest{Method: "POST", URL: addUrl, Body: string(jsonStr)})
+	if !response.Success {
+		return addRaindropResult, response.Error
+	}
+
+	err = json.Unmarshal(response.Body, &addRaindropResult)
 	if err != nil {
-		return listRaindropsResult, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return listRaindropsResult, fmt.Errorf("bad status at list bookmarks: %d: %s", resp.StatusCode, resp.Status)
+		return addRaindropResult, err
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return listRaindropsResult, err
+	if !addRaindropResult.Result {
+		return addRaindropResult, fmt.Errorf("add raindrop returned false: %s", addRaindropResult.ErrorMessage)
 	}
 
-	err = json.Unmarshal(body, &listRaindropsResult)
+	return addRaindropResult, nil
+}
+
+func (ac *APIClient) ListRaindrops(page int) (data.ListRaindropsResult, error) {
+	var (
+		err                 error
+		listRaindropsResult data.ListRaindropsResult
+		listUrl             url.URL
+		queryMap            map[string]string
+		response            APIResponse
+	)
+	queryMap = map[string]string{"sort": "-lastUpdate&perpage", "perpage": strconv.Itoa(PageSize), "page": strconv.Itoa(page), "version": "2"}
+	listUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/raindrops/0", apiVersion), RawQuery: MapToQueryString(queryMap)}
+	response = ac.Request(APIRequest{Method: "GET", URL: listUrl})
+	if !response.Success {
+		return listRaindropsResult, response.Error
+	}
+
+	err = json.Unmarshal(response.Body, &listRaindropsResult)
 	if err != nil {
 		return listRaindropsResult, err
 	}
 
 	if !listRaindropsResult.Result {
-		return listRaindropsResult, fmt.Errorf("list bookmarks returned false: %s", listRaindropsResult.ErrorMessage)
+		return listRaindropsResult, fmt.Errorf("list raindrops returned false: %s", listRaindropsResult.ErrorMessage)
 	}
 
 	return listRaindropsResult, nil
+}
+
+func (ac *APIClient) RemoveRaindrop(raindropId int64) (data.RemoveRaindropResult, error) {
+	var (
+		err                  error
+		removeRaindropResult data.RemoveRaindropResult
+		removeUrl            url.URL
+		response             APIResponse
+	)
+	removeUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/raindrop/%d", apiVersion, raindropId)}
+	response = ac.Request(APIRequest{Method: "DELETE", URL: removeUrl})
+	if !response.Success {
+		return removeRaindropResult, response.Error
+	}
+
+	err = json.Unmarshal(response.Body, &removeRaindropResult)
+	if err != nil {
+		return removeRaindropResult, err
+	}
+
+	if !removeRaindropResult.Result {
+		return removeRaindropResult, fmt.Errorf("remove raindrop returned false: %s", removeRaindropResult.ErrorMessage)
+	}
+
+	return removeRaindropResult, nil
 }

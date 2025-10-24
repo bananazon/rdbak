@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/gdanko/rdbak/pkg/cookie_jar"
+	"github.com/bananazon/rdbak/pkg/cookie_jar"
 	"github.com/sirupsen/logrus"
 )
 

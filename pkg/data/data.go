@@ -47,11 +47,10 @@ type LoginResult struct {
 	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
 }
 
-type ListCollectionsResult struct {
-	Result       bool          `json:"result" yaml:"result"`
-	Items        []*Collection `json:"items" yaml:"items"`
-	Count        int           `json:"count" yaml:"count"`
-	ErrorMessage string        `json:"errorMessage" yaml:"errorMessage"`
+type AddRaindropResult struct {
+	Result       bool     `json:"result" yaml:"result"`
+	ErrorMessage string   `json:"errorMessage" yaml:"errorMessage"`
+	Item         Raindrop `json:"item" yaml:"item"`
 }
 
 type ListRaindropsResult struct {
@@ -59,6 +58,32 @@ type ListRaindropsResult struct {
 	Items        []*Raindrop `json:"items" yaml:"items"`
 	Count        int         `json:"count" yaml:"count"`
 	ErrorMessage string      `json:"errorMessage" yaml:"errorMessage"`
+}
+type RemoveRaindropResult struct {
+	Result       bool   `json:"result" yaml:"result"`
+	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+}
+
+type AddCollectionResult struct {
+	Result       bool       `json:"result" yaml:"result"`
+	ErrorMessage string     `json:"errorMessage" yaml:"errorMessage"`
+	Item         Collection `json:"item" yaml:"item"`
+}
+
+type ListCollectionsResult struct {
+	Result       bool          `json:"result" yaml:"result"`
+	Items        []*Collection `json:"items" yaml:"items"`
+	Count        int           `json:"count" yaml:"count"`
+	ErrorMessage string        `json:"errorMessage" yaml:"errorMessage"`
+}
+type RemoveCollectionResult struct {
+	Result       bool   `json:"result" yaml:"result"`
+	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+}
+
+type SortCollectionsResult struct {
+	Result       bool   `json:"result" yaml:"result"`
+	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
 }
 
 /*
