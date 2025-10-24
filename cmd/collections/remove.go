@@ -25,10 +25,10 @@ func newRemoveCollectionCmd(ctx *context.AppContext) (c *cobra.Command) {
 				ctx.FlagRemoveCollectionId,
 			)
 			if err != nil {
-				ctx.Logger.Println("RemoveCollection failed:", err)
+				ctx.Logger.Println("Failed to remove the collection:", err)
 				return err
 			}
-			ctx.Logger.Println("Collection removed successfully.")
+			ctx.Logger.Println("Successfully removed the collection")
 			return nil
 		},
 	}

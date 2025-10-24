@@ -29,14 +29,14 @@ func newListBookmarksCmd(ctx *context.AppContext) (c *cobra.Command) {
 		RunE: func(cmdC *cobra.Command, args []string) error {
 			bookmarks, err := ctx.RD.ListBookmarks()
 			if err != nil {
-				ctx.Logger.Error(err)
-				ctx.Logger.Exit(1)
+				ctx.Logger.Println("Failed to get a list of bookmarks:", err)
+				return err
 			}
 
 			collections, err := ctx.RD.ListCollections()
 			if err != nil {
-				ctx.Logger.Error(err)
-				ctx.Logger.Exit(1)
+				ctx.Logger.Println("Failed to get a list of collections:", err)
+				return err
 			}
 
 			t := rdtable.GetTableTemplate("Bookmarks", ctx.FlagPageSize, ctx.FlagPageStyle)

@@ -28,7 +28,7 @@ func newRemoveBookmarkCmd(ctx *context.AppContext) (c *cobra.Command) {
 				ctx.Logger.Println("Failed to remove the bookmark:", err)
 				return err
 			}
-			ctx.Logger.Println("Bookmark removed successfully.")
+			ctx.Logger.Println("Successfully removed the bookmark")
 			return nil
 		},
 	}

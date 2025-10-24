@@ -27,10 +27,10 @@ func newAddCollectionCmd(ctx *context.AppContext) (c *cobra.Command) {
 				ctx.FlagAddCollectionPublic,
 			)
 			if err != nil {
-				ctx.Logger.Println("AddCollection failed:", err)
+				ctx.Logger.Println("Failed to add the collection:", err)
 				return err
 			}
-			ctx.Logger.Println("Collection added successfully.")
+			ctx.Logger.Println("Successfully added the collection")
 			return nil
 		},
 	}
@@ -39,36 +39,3 @@ func newAddCollectionCmd(ctx *context.AppContext) (c *cobra.Command) {
 
 	return c
 }
-
-// var (
-// 	addCollectionCmd = &cobra.Command{
-// 		Use:          "add",
-// 		Aliases:      []string{"a"},
-// 		Short:        "Add a new collection to your raindrop.io account",
-// 		Long:         "Add a new collection to your raindrop.io account",
-// 		PreRun:       addCollectionPreRunCmd,
-// 		Run:          addCollectionRunCmd,
-// 		SilenceUsage: false,
-// 	}
-// )
-
-// func init() {
-// 	cmd.GetAddCollectionFlags(addCollectionCmd)
-// 	CollectionsCmd.AddCommand(addCollectionCmd)
-// }
-
-// func addCollectionPreRunCmd(cmdC *cobra.Command, args []string) {
-// 	cmd.RD, err = raindrop.New(cmd.RaindropHome, cmd.RaindropConfig, cmd.Logger)
-// 	if err != nil {
-// 		cmd.Logger.Error(err)
-// 		cmd.Logger.Exit(1)
-// 	}
-// }
-
-// func addCollectionRunCmd(cmdC *cobra.Command, args []string) {
-// 	_, err := cmd.RD.API.AddCollection(cmd.FlagAddCollectionTitle, cmd.FlagAddCollectionParent, cmd.FlagAddCollectionPublic)
-// 	if err != nil {
-// 		cmd.Logger.Error(err)
-// 		cmd.Logger.Exit(1)
-// 	}
-// }

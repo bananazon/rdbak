@@ -23,9 +23,10 @@ func newSortCollectionsCmd(ctx *context.AppContext) (c *cobra.Command) {
 		RunE: func(cmdC *cobra.Command, args []string) error {
 			_, err := ctx.RD.API.SortCollections(ctx.FlagCollectionsSortOrder)
 			if err != nil {
-				ctx.Logger.Println("SortCollections failed:", err)
+				ctx.Logger.Println("Failed to sort the collection:", err)
 				return err
 			}
+			ctx.Logger.Println("Successfully sorted the collection")
 			return nil
 		},
 	}
@@ -34,36 +35,3 @@ func newSortCollectionsCmd(ctx *context.AppContext) (c *cobra.Command) {
 
 	return c
 }
-
-// var (
-// 	sortCollectionCmd = &cobra.Command{
-// 		Use:          "sort",
-// 		Aliases:      []string{"s"},
-// 		Short:        "Sort your raindrop.io collections",
-// 		Long:         "Sort your raindrop.io collections",
-// 		PreRun:       sortCollectionPreRunCmd,
-// 		Run:          sortCollectionRunCmd,
-// 		SilenceUsage: false,
-// 	}
-// )
-
-// func init() {
-// 	cmd.GetSortCollectionFlags(sortCollectionCmd)
-// 	CollectionsCmd.AddCommand(sortCollectionCmd)
-// }
-
-// func sortCollectionPreRunCmd(cmdC *cobra.Command, args []string) {
-// 	cmd.RD, err = raindrop.New(cmd.RaindropHome, cmd.RaindropConfig, cmd.Logger)
-// 	if err != nil {
-// 		cmd.Logger.Error(err)
-// 		cmd.Logger.Exit(1)
-// 	}
-// }
-
-// func sortCollectionRunCmd(cmdC *cobra.Command, args []string) {
-// 	_, err = cmd.RD.API.SortCollections(cmd.FlagCollectionsSortOrder)
-// 	if err != nil {
-// 		cmd.Logger.Error(err)
-// 		cmd.Logger.Exit(1)
-// 	}
-// }

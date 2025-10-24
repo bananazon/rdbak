@@ -29,7 +29,7 @@ func newListCollectionsCmd(ctx *context.AppContext) (c *cobra.Command) {
 		RunE: func(cmdC *cobra.Command, args []string) error {
 			collections, err := ctx.RD.ListCollections()
 			if err != nil {
-				ctx.Logger.Println("ListCollections failed:", err)
+				ctx.Logger.Println("Failed to get a list of collections:", err)
 				return err
 			}
 
@@ -66,60 +66,3 @@ func newListCollectionsCmd(ctx *context.AppContext) (c *cobra.Command) {
 	return c
 
 }
-
-// var (
-// 	listCollectionsCmd = &cobra.Command{
-// 		Use:          "list",
-// 		Aliases:      []string{"l", "ls"},
-// 		Short:        "List the collections in your raindrop.io account",
-// 		Long:         "List the collections in your raindrop.io account",
-// 		PreRun:       listCollectionsPreRunCmd,
-// 		Run:          listCollectionsRunCmd,
-// 		SilenceUsage: false,
-// 	}
-// )
-
-// func init() {
-// 	cmd.GetTableFlags(listCollectionsCmd)
-// 	CollectionsCmd.AddCommand(listCollectionsCmd)
-// }
-
-// func listCollectionsPreRunCmd(cmdC *cobra.Command, args []string) {
-// 	cmd.RD, err = raindrop.New(cmd.RaindropHome, cmd.RaindropConfig, cmd.Logger)
-// 	if err != nil {
-// 		cmd.Logger.Error(err)
-// 		cmd.Logger.Exit(1)
-// 	}
-// }
-
-// func listCollectionsRunCmd(cmdC *cobra.Command, args []string) {
-// 	collections, err := cmd.RD.ListCollections()
-// 	if err != nil {
-// 		cmd.Logger.Error(err)
-// 		cmd.Logger.Exit(1)
-// 	}
-
-// 	t := cmd.GetTableTemplate("Collections")
-// 	t.SortBy([]table.SortBy{{Name: "Title", Mode: table.Asc}})
-// 	t.SetColumnConfigs([]table.ColumnConfig{{Name: "Count", Align: text.AlignLeft}})
-// 	t.AppendHeader(table.Row{"ID", "Title", "View", "Description", "Count"})
-
-// 	for _, collection := range collections {
-// 		var description string
-
-// 		if collection.Description == "" {
-// 			description = "N/A"
-// 		} else {
-// 			description = collection.Description
-// 		}
-// 		t.AppendRow(table.Row{
-// 			strconv.Itoa(int(collection.Id)),
-// 			collection.Title,
-// 			collection.View,
-// 			description,
-// 			collection.Count,
-// 		})
-// 	}
-
-// 	fmt.Println(t.Render())
-// }

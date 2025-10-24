@@ -26,7 +26,7 @@ func newBackupBookmarksCmd(ctx *context.AppContext) (c *cobra.Command) {
 				ctx.Logger.Println("Backup failed:", err)
 				return err
 			}
-			ctx.Logger.Println("Backup successful.")
+			ctx.Logger.Println("Backup successful")
 			return nil
 		},
 	}

@@ -30,7 +30,7 @@ func newAddBookmarkCmd(ctx *context.AppContext) (c *cobra.Command) {
 				ctx.Logger.Println("Failed to add the bookmark:", err)
 				return err
 			}
-			ctx.Logger.Println("Bookmark added successfully.")
+			ctx.Logger.Println("Successfully added the bookmark")
 			return nil
 		},
 	}
@@ -39,36 +39,3 @@ func newAddBookmarkCmd(ctx *context.AppContext) (c *cobra.Command) {
 
 	return c
 }
-
-// var (
-// 	addRaindropCmd = &cobra.Command{
-// 		Use:          "add",
-// 		Aliases:      []string{"a"},
-// 		Short:        "Add a new raindrop to your raindrop.io account",
-// 		Long:         "Add a new raindrop to your raindrop.io account",
-// 		PreRun:       addRaindropPreRunCmd,
-// 		Run:          addRaindropRunCmd,
-// 		SilenceUsage: false,
-// 	}
-// )
-
-// func init() {
-// 	cmd.GetAddRaindropFlags(addRaindropCmd)
-// 	raindropCmd.AddCommand(addRaindropCmd)
-// }
-
-// func addRaindropPreRunCmd(cmdC *cobra.Command, args []string) {
-// 	cmd.RD, err = raindrop.New(cmd.RaindropHome, cmd.RaindropConfig, cmd.Logger)
-// 	if err != nil {
-// 		cmd.Logger.Error(err)
-// 		cmd.Logger.Exit(1)
-// 	}
-// }
-
-// func addRaindropRunCmd(cmdC *cobra.Command, args []string) {
-// 	_, err := cmd.RD.API.AddRaindrop(cmd.FlagAddBookmarkLink, cmd.FlagAddBookmarkTitle, int64(cmd.FlagAddBookmarkCollectionId))
-// 	if err != nil {
-// 		cmd.Logger.Error(err)
-// 		cmd.Logger.Exit(1)
-// 	}
-// }
