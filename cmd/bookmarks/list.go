@@ -27,7 +27,7 @@ func newListBookmarksCmd(ctx *context.AppContext) (c *cobra.Command) {
 			return nil
 		},
 		RunE: func(cmdC *cobra.Command, args []string) error {
-			raindrops, err := ctx.RD.ListBookmarks()
+			bookmarks, err := ctx.RD.ListBookmarks()
 			if err != nil {
 				ctx.Logger.Error(err)
 				ctx.Logger.Exit(1)
@@ -43,13 +43,13 @@ func newListBookmarksCmd(ctx *context.AppContext) (c *cobra.Command) {
 			t.SortBy([]table.SortBy{{Name: "Collection", Mode: table.Asc}, {Name: "Link", Mode: table.Asc}})
 			t.AppendHeader(table.Row{"ID", "Collection", "Link", "Tags"})
 
-			for idx, raindrop := range raindrops {
-				raindrops[idx].Collection.Name = "Unsorted"
-				collectionId := raindrops[idx].Collection.Id
+			for idx, raindrop := range bookmarks {
+				bookmarks[idx].Collection.Name = "Unsorted"
+				collectionId := bookmarks[idx].Collection.Id
 				collection, exists := collections[uint64(collectionId)]
 				if exists {
-					if raindrops[idx].Collection.Id > 0 {
-						raindrops[idx].Collection.Name = collection.Title
+					if bookmarks[idx].Collection.Id > 0 {
+						bookmarks[idx].Collection.Name = collection.Title
 					}
 				}
 
