@@ -7,8 +7,8 @@ import (
 	"slices"
 	"time"
 
-	"github.com/bananazon/rdbak/pkg/data"
-	"github.com/bananazon/rdbak/pkg/util"
+	"github.com/bananazon/raindrop/pkg/data"
+	"github.com/bananazon/raindrop/pkg/util"
 	"gopkg.in/yaml.v3"
 )
 

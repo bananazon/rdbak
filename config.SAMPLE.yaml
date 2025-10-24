@@ -1,4 +1,4 @@
 email: user@example.com
 password: mysupersecretpassword
-bookmarksFile: /home/dummy/.config/rdbak/bookmarks.yaml
-exportDir: /home/dummy/.config/rdbak
+bookmarksFile: /home/dummy/.config/raindrop/bookmarks.yaml
+exportDir: /home/dummy/.config/raindrop

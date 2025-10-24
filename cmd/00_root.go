@@ -5,11 +5,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bananazon/rdbak/cmd/collections"
-	"github.com/bananazon/rdbak/cmd/raindrops"
-	"github.com/bananazon/rdbak/pkg/context"
-	"github.com/bananazon/rdbak/pkg/raindrop"
-	"github.com/bananazon/rdbak/pkg/util"
+	"github.com/bananazon/raindrop/cmd/collections"
+	"github.com/bananazon/raindrop/cmd/raindrops"
+	"github.com/bananazon/raindrop/pkg/context"
+	"github.com/bananazon/raindrop/pkg/raindrop"
+	"github.com/bananazon/raindrop/pkg/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -43,7 +43,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	RaindropHome = filepath.Join(homeDir, ".config", "rdbak")
+	RaindropHome = filepath.Join(homeDir, ".config", "raindrop")
 
 	err = util.VerifyDirectory(RaindropHome)
 	if err != nil {
@@ -51,7 +51,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	RaindropLogFile = filepath.Join(RaindropHome, "rdbak.log")
+	RaindropLogFile = filepath.Join(RaindropHome, "raindrop.log")
 	Logger = util.ConfigureLogger(FlagNoColor, RaindropLogFile)
 
 	ctx := &context.AppContext{

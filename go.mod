@@ -1,4 +1,4 @@
-module github.com/bananazon/rdbak
+module github.com/bananazon/raindrop
 
 go 1.24.8
 

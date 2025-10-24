@@ -3,9 +3,9 @@ package raindrop
 import (
 	"os"
 
-	"github.com/bananazon/rdbak/pkg/api"
-	"github.com/bananazon/rdbak/pkg/data"
-	"github.com/bananazon/rdbak/pkg/util"
+	"github.com/bananazon/raindrop/pkg/api"
+	"github.com/bananazon/raindrop/pkg/data"
+	"github.com/bananazon/raindrop/pkg/util"
 	"gopkg.in/yaml.v3"
 )
 

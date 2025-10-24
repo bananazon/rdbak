@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bananazon/rdbak/pkg/raindrop"
+	"github.com/bananazon/raindrop/pkg/raindrop"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -57,7 +57,7 @@ func (ac *AppContext) GetSortCollectionFlags(cmd *cobra.Command) {
 }
 
 func (ac *AppContext) GetAddRaindropFlags(cmd *cobra.Command) {
-	cmd.Flags().Int64VarP(&ac.FlagAddRaindropCollectionId, "collection", "c", -1, "The collection ID of the new raindrop (`rdbak lc` to find the ID)")
+	cmd.Flags().Int64VarP(&ac.FlagAddRaindropCollectionId, "collection", "c", -1, "The collection ID of the new raindrop (`raindrop lc` to find the ID)")
 	// cmd.Flags().StringVarP(&ac.FlagAddRaindropExcerpt, "excerpt", "e", "", "A brief description of the link")
 	cmd.Flags().StringVarP(&ac.FlagAddRaindropTitle, "title", "t", "", "The title for the new raindrop")
 	cmd.Flags().StringVarP(&ac.FlagAddRaindropLink, "link", "l", "", "The URL for the new raindrop")

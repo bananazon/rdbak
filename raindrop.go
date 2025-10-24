@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/bananazon/rdbak/cmd"
+	"github.com/bananazon/raindrop/cmd"
 )
 
 func main() {

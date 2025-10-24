@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/bananazon/rdbak/pkg/context"
-	"github.com/bananazon/rdbak/pkg/raindrop"
-	rdtable "github.com/bananazon/rdbak/pkg/table"
+	"github.com/bananazon/raindrop/pkg/context"
+	"github.com/bananazon/raindrop/pkg/raindrop"
+	rdtable "github.com/bananazon/raindrop/pkg/table"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/spf13/cobra"

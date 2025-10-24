@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bananazon/rdbak/pkg/util"
+	"github.com/bananazon/raindrop/pkg/util"
 )
 
 func (ac *APIClient) DownloadFileIfMissing(title string, id uint64, exportDir string) (bool, error) {

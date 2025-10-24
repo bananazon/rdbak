@@ -2,7 +2,7 @@ GOPATH := $(shell go env GOPATH)
 GOOS := $(shell go env GOOS)
 GOARCH := $(shell go env GOARCH)
 GOBIN := $(shell go env GOBIN)
-rdbak_VERSION := "0.5.0"
+RAINDROP_VERSION := "0.5.0"
 
 GOOS ?= $(shell uname | tr '[:upper:]' '[:lower:]')
 GOARCH ?=$(shell arch)
@@ -16,25 +16,25 @@ mod-tidy:
 	go mod tidy
 
 .PHONY: build OS ARCH
-build: guard-rdbak_VERSION mod-tidy clean
+build: guard-RAINDROP_VERSION mod-tidy clean
 	@echo "================================================="
-	@echo "Building rdbak"
+	@echo "Building raindrop"
 	@echo "================================================="
 
 	@if [ ! -d "bin" ]; then \
 		mkdir "bin"; \
 	fi
-	GOOS=${GOOS} GOARCH=${GOARCH} go build -o "bin/rdbak"
+	GOOS=${GOOS} GOARCH=${GOARCH} go build -o "bin/raindrop"
 	sleep 2
-	tar -czvf "rdbak_${rdbak_VERSION}_${GOOS}_${GOARCH}.tgz" bin; \
+	tar -czvf "raindrop_${RAINDROP_VERSION}_${GOOS}_${GOARCH}.tgz" bin; \
 
 .PHONY: clean
 clean:
 	@echo "================================================="
-	@echo "Cleaning rdbak"
+	@echo "Cleaning raindrop"
 	@echo "================================================="
-	@if [ -f bin/rdbak ]; then \
-		rm -f bin/rdbak; \
+	@if [ -f bin/raindrop ]; then \
+		rm -f bin/raindrop; \
 	fi; \
 
 .PHONY: clean-all
@@ -47,7 +47,7 @@ clean-all: clean
 .PHONY: install
 install:
 	@echo "================================================="
-	@echo "Installing rdbak in ${GOPATH}/bin"
+	@echo "Installing raindrop in ${GOPATH}/bin"
 	@echo "================================================="
 
 	GOOS=${GOOS} GOARCH=${GOARCH} go install

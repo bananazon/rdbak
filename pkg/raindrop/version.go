@@ -33,7 +33,7 @@ func Version(prefix, suffix, versionFull bool) string {
 		version = fmt.Sprintf("%s-%s-%s", version, runtime.GOOS, runtime.GOARCH)
 
 		var creationTime time.Time
-		path, err := exec.LookPath("rdbak")
+		path, err := exec.LookPath("raindrop")
 		if err == nil && path != "" {
 			t, err := times.Stat(path)
 			if err == nil {

@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/bananazon/rdbak/pkg/data"
+	"github.com/bananazon/raindrop/pkg/data"
 )
 
 func (ac *APIClient) AddCollection(title string, parentId int64, public bool) (data.AddCollectionResult, error) {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bananazon/rdbak/pkg/api"
-	"github.com/bananazon/rdbak/pkg/data"
+	"github.com/bananazon/raindrop/pkg/api"
+	"github.com/bananazon/raindrop/pkg/data"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )

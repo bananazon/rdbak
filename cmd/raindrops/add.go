@@ -1,8 +1,8 @@
 package raindrops
 
 import (
-	"github.com/bananazon/rdbak/pkg/context"
-	"github.com/bananazon/rdbak/pkg/raindrop"
+	"github.com/bananazon/raindrop/pkg/context"
+	"github.com/bananazon/raindrop/pkg/raindrop"
 	"github.com/spf13/cobra"
 )
 
