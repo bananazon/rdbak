@@ -5,34 +5,35 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gdanko/rdbak/pkg/raindrop"
-	"github.com/gdanko/rdbak/pkg/util"
+	"github.com/bananazon/rdbak/cmd/collections"
+	"github.com/bananazon/rdbak/cmd/raindrops"
+	"github.com/bananazon/rdbak/pkg/context"
+	"github.com/bananazon/rdbak/pkg/raindrop"
+	"github.com/bananazon/rdbak/pkg/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 var (
-	err           error
-	flagNoColor   bool
-	flagPageSize  int
-	flagPageStyle string
-	homeDir       string
-	logger        *logrus.Logger
-	rd            *raindrop.Raindrop
-	rdbakConfig   string
-	rdbakHome     string
-	rdbakLogfile  string
-	rootCmd       = &cobra.Command{
-		Use:   "rdbak",
-		Short: "rdbak is a command line utility to backup your raindrop.io bookmarks",
-		Long:  "rdbak is a command line utility to backup your raindrop.io bookmarks",
+	err             error
+	FlagNoColor     bool
+	homeDir         string
+	Logger          *logrus.Logger
+	RD              *raindrop.Raindrop
+	RaindropConfig  string
+	RaindropHome    string
+	RaindropLogFile string
+	RootCmd         = &cobra.Command{
+		Use:   "raindrop",
+		Short: "Manage and backup your raindrop.io bookmarks and collections",
+		Long:  "Manage and backup your raindrop.io bookmarks and collections",
 	}
-	validStyles = []string{"ascii", "bright", "dark", "light"}
+
 	versionFull bool
 )
 
 func Execute() error {
-	return rootCmd.Execute()
+	return RootCmd.Execute()
 }
 
 func init() {
@@ -42,15 +43,25 @@ func init() {
 		os.Exit(1)
 	}
 
-	rdbakHome = filepath.Join(homeDir, ".config", "rdbak")
+	RaindropHome = filepath.Join(homeDir, ".config", "rdbak")
 
-	err = util.VerifyDirectory(rdbakHome)
+	err = util.VerifyDirectory(RaindropHome)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	rdbakConfig = filepath.Join(rdbakHome, "config.yaml")
-	rdbakLogfile = filepath.Join(rdbakHome, "rdbak.log")
-	logger = util.ConfigureLogger(flagNoColor, rdbakLogfile)
+	RaindropLogFile = filepath.Join(RaindropHome, "rdbak.log")
+	Logger = util.ConfigureLogger(FlagNoColor, RaindropLogFile)
+
+	ctx := &context.AppContext{
+		Logger:                    util.ConfigureLogger(FlagNoColor, RaindropLogFile),
+		RaindropHome:              RaindropHome,
+		RaindropConfig:            filepath.Join(RaindropHome, "config.yaml"),
+		ValidCollectionsSortOrder: []string{"title", "-title", "-count"},
+		ValidStyles:               []string{"ascii", "bright", "dark", "light"},
+	}
+
+	RootCmd.AddCommand(collections.NewCollectionsCmd(ctx))
+	RootCmd.AddCommand(raindrops.NewRaindropsCmd(ctx))
 }

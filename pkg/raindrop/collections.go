@@ -1,6 +1,6 @@
 package raindrop
 
-import "github.com/gdanko/rdbak/pkg/data"
+import "github.com/bananazon/rdbak/pkg/data"
 
 func (r *Raindrop) ListCollections() (collections map[uint64]*data.Collection, err error) {
 	collections = make(map[uint64]*data.Collection)

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/gdanko/rdbak/cmd"
+	"github.com/bananazon/rdbak/cmd"
 )
 
 func main() {

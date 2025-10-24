@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/gdanko/rdbak/pkg/data"
+	"github.com/bananazon/rdbak/pkg/data"
 )
 
 func (ac *APIClient) Login(email, pass string) error {

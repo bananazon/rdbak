@@ -1,6 +1,6 @@
 package raindrop
 
-import "github.com/gdanko/rdbak/pkg/crypt"
+import "github.com/bananazon/rdbak/pkg/crypt"
 
 func (r *Raindrop) EncryptPassword() (err error) {
 	ciphertext, err := crypt.Encrypt(r.Config.Password)

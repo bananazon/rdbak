@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/gdanko/rdbak/pkg/raindrop"
+	"github.com/bananazon/rdbak/pkg/raindrop"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +19,7 @@ var (
 
 func init() {
 	versionCmd.Flags().BoolVarP(&versionFull, "full", "f", false, "Display more version information")
-	rootCmd.AddCommand(versionCmd)
+	RootCmd.AddCommand(versionCmd)
 }
 
 func runVersionCmd(cmd *cobra.Command, args []string) error {
