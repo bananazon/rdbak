@@ -23,10 +23,10 @@ func newBackupBookmarksCmd(ctx *context.AppContext) (c *cobra.Command) {
 		RunE: func(cmdC *cobra.Command, args []string) error {
 			err := ctx.RD.BackupBookmarks(ctx.FlagPrune)
 			if err != nil {
-				ctx.Logger.Println("Backup failed:", err.Error())
+				ctx.Logger.Println("Failed to backup the bookmarks:", err.Error())
 				return err
 			}
-			ctx.Logger.Println("Backup successful")
+			ctx.Logger.Println("Successfully backed up the bookmarks")
 			return nil
 		},
 	}
