@@ -119,7 +119,7 @@ func (ac *APIClient) UpdateBookmark(bookmarkId int64, payload data.UpdateBookmar
 	}
 
 	if !updateBookmarkResult.Result {
-		return updateBookmarkResult, fmt.Errorf("add bookmark returned false: %s", updateBookmarkResult.ErrorMessage)
+		return updateBookmarkResult, fmt.Errorf("update bookmark returned false: %s", updateBookmarkResult.ErrorMessage)
 	}
 
 	return updateBookmarkResult, nil
