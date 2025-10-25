@@ -9,21 +9,21 @@ import (
 	"github.com/bananazon/raindrop/pkg/data"
 )
 
-func (ac *APIClient) AddBookmark(link string, title string, collectionId int64) (data.AddBookmarkResult, error) {
+func (ac *APIClient) AddBookmark(payload data.AddBookmarkPayload) (data.AddBookmarkResult, error) {
 	var (
 		addBookmarkResult data.AddBookmarkResult
 		addUrl            url.URL
 		err               error
 		response          APIResponse
 	)
-	jsonBody := map[string]string{"link": link, "title": title, "collectionId": strconv.FormatInt(collectionId, 10)}
-	jsonStr, err := json.Marshal(&jsonBody)
+
+	jsonData, err := json.Marshal(payload)
 	if err != nil {
 		return addBookmarkResult, err
 	}
 
 	addUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/raindrop", apiVersion)}
-	response = ac.Request(APIRequest{Method: "POST", URL: addUrl, Body: string(jsonStr)})
+	response = ac.Request(APIRequest{Method: "POST", URL: addUrl, Body: string(jsonData)})
 	if !response.Success {
 		return addBookmarkResult, response.Error
 	}
