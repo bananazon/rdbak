@@ -33,6 +33,10 @@ type AppContext struct {
 	ValidStyles                 []string
 }
 
+func (ac *AppContext) GetBackupFlags(cmd *cobra.Command) {
+	cmd.Flags().BoolVarP(&ac.FlagPrune, "prune", "p", false, "Prune older [bookmarks|collections]-{timestamp}.yaml files")
+}
+
 func (ac *AppContext) GetTableFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&ac.FlagPageStyle, "page-style", "s", "light", fmt.Sprintf("The page style to use; one of %s", strings.Join(ac.ValidStyles, ",")))
 	cmd.Flags().IntVarP(&ac.FlagPageSize, "page-size", "p", 40, "The page size for the paginator")
@@ -65,10 +69,6 @@ func (ac *AppContext) GetAddBookmarkFlags(cmd *cobra.Command) {
 
 	cmd.MarkFlagRequired("link")
 	cmd.MarkFlagRequired("title")
-}
-
-func (ac *AppContext) GetBackupBookmarksFlags(cmd *cobra.Command) {
-	cmd.Flags().BoolVarP(&ac.FlagPrune, "prune", "p", false, "Prune older bookmarks-{timestamp}.yaml files")
 }
 
 func (ac *AppContext) GetRemoveBookmarkFlags(cmd *cobra.Command) {
