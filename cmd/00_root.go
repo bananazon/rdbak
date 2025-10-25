@@ -60,6 +60,7 @@ func init() {
 		RaindropHome:              RaindropHome,
 		RaindropConfig:            filepath.Join(RaindropHome, "config.yaml"),
 		ValidCollectionsSortOrder: []string{"title", "-title", "-count"},
+		ValidCollectionsViews:     []string{"grid", "list", "masonry", "simple"},
 		ValidStyles:               []string{"ascii", "bright", "dark", "light"},
 	}
 
