@@ -7,6 +7,7 @@ import (
 
 	"github.com/bananazon/raindrop/cmd/bookmarks"
 	"github.com/bananazon/raindrop/cmd/collections"
+	"github.com/bananazon/raindrop/cmd/tags"
 	"github.com/bananazon/raindrop/pkg/context"
 	"github.com/bananazon/raindrop/pkg/raindrop"
 	"github.com/bananazon/raindrop/pkg/util"
@@ -25,8 +26,8 @@ var (
 	RaindropLogFile string
 	RootCmd         = &cobra.Command{
 		Use:   "raindrop",
-		Short: "Manage and backup your raindrop.io bookmarks and collections",
-		Long:  "Manage and backup your raindrop.io bookmarks and collections",
+		Short: "Manage your raindrop.io bookmarks, collections, and tags",
+		Long:  "Manage your raindrop.io bookmarks, collections, and tags",
 	}
 
 	versionFull bool
@@ -62,6 +63,7 @@ func init() {
 		ValidStyles:               []string{"ascii", "bright", "dark", "light"},
 	}
 
-	RootCmd.AddCommand(collections.NewCollectionsCmd(ctx))
 	RootCmd.AddCommand(bookmarks.NewBookmarksCmd(ctx))
+	RootCmd.AddCommand(collections.NewCollectionsCmd(ctx))
+	RootCmd.AddCommand(tags.NewTagsCmd(ctx))
 }
