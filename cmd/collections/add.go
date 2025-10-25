@@ -26,6 +26,7 @@ func newAddCollectionCmd(ctx *context.AppContext) (c *cobra.Command) {
 				Title:  ctx.FlagAddCollectionTitle,
 				Parent: ctx.FlagAddCollectionParent,
 				Public: ctx.FlagAddCollectionPublic,
+				View:   ctx.FlagAddCollectionView,
 			})
 			if err != nil {
 				ctx.Logger.Println("Failed to add the collection:", err.Error())
