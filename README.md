@@ -1,38 +1,7 @@
-# Raindrop bookmark backup
+# Raindrop CLI
 
-`raindrop` is a minimalistic command line tool that downloads a local backup of your [Raindrop.io](https://raindrop.io) and stores them in a YAML file. Note, this is an enhanced version of [raindrop](https://github.com/gugray/raindrop). I created this version because the original version lacked some things I wanted, e.g., proper error handling. However, I needed to give credit where it's due.
-
-## Differences
-* I'm using the [cobra](https://github.com/spf13/cobra) framework.
-* I added a logging mechanism that logs to STDOUT/STDERR when run from the terminal and to `~/.config/raindrop/raindrop.log` when run via cron.
-* Instead of using `panic(err)`, I properly return and process the errors.
-* I chose YAML for the config and bookmarks files because stings in YAML don't have to be quoted and a double quote can mess with JSON in some cases.
-* I also detect deleted bookmarks and remove them from the `bookmarks.yaml` file. This wasn't being done in the original.
-* I only create a backup file if there are changes.
-* When a backup is saved, the existing file is copied to `bookmarks-{timestamp}.yaml`.
-* The `backup` command has a `--prune` option to delete `bookmarks-{timestamp}.yaml` files older than seven days. The retention period will soon be made into a flag."
-* At runtime, raindrop verifies `~/.config/raindrop` exists, is a directory, and is writable. If it doesn't exist, raindrop attempts to create it with 0600 as the mode.
+`raindrop` started as an enhanced version of [raindrop](https://github.com/gugray/raindrop) and evolved into something more. It now allows you to manage bookmarks, collections, and tags. I've also replaced the email/password auth with API Token auth.
 
 ## Installation
-* Clone this repository
-* `cd <repo root>`
-* `make install`
-* `mkdir -p ~/.config/raindrop`
-* `cp config.SAMPLE.yaml ~/.config/raindrop/config.yaml`
-* Populate the `~/.config/raindrop/config.yaml` with your details
-* `raindrop encrypt-password`
-* `raindrop backup`
 
-## Available Command
-Run `raindrop` by itself for a list of available commands. Run `raindrop <command> --help` for command-specific help, including command aliases.
-
-## crontab
-I run it every five minutes
-```
-% crontab -l
-#raindrop
-*/5 * * * * /home/dummy/go/bin/raindrop backup --prune
-```
-
-## More Coming Soon!
-I will populate more of this soon
+1. Clone the repository with 
