@@ -7,6 +7,7 @@ import (
 
 	"github.com/bananazon/raindrop/cmd/bookmarks"
 	"github.com/bananazon/raindrop/cmd/collections"
+	"github.com/bananazon/raindrop/cmd/encrypt"
 	"github.com/bananazon/raindrop/cmd/tags"
 	"github.com/bananazon/raindrop/pkg/context"
 	"github.com/bananazon/raindrop/pkg/raindrop"
@@ -45,6 +46,7 @@ func init() {
 	}
 
 	RaindropHome = filepath.Join(homeDir, ".config", "raindrop")
+	RaindropConfig = filepath.Join(RaindropHome, "config.yaml")
 
 	err = util.VerifyDirectory(RaindropHome)
 	if err != nil {
@@ -58,7 +60,7 @@ func init() {
 	ctx := &context.AppContext{
 		Logger:                    util.ConfigureLogger(FlagNoColor, RaindropLogFile),
 		RaindropHome:              RaindropHome,
-		RaindropConfig:            filepath.Join(RaindropHome, "config.yaml"),
+		RaindropConfig:            RaindropConfig,
 		ValidCollectionsSortOrder: []string{"title", "-title", "-count"},
 		ValidCollectionsViews:     []string{"grid", "list", "masonry", "simple"},
 		ValidStyles:               []string{"ascii", "bright", "dark", "light"},
@@ -66,5 +68,6 @@ func init() {
 
 	RootCmd.AddCommand(bookmarks.NewBookmarksCmd(ctx))
 	RootCmd.AddCommand(collections.NewCollectionsCmd(ctx))
+	RootCmd.AddCommand(encrypt.NewEncryptTokenCmd(ctx))
 	RootCmd.AddCommand(tags.NewTagsCmd(ctx))
 }
