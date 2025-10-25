@@ -26,10 +26,10 @@ func newSortCollectionsCmd(ctx *context.AppContext) (c *cobra.Command) {
 				Sort: ctx.FlagCollectionsSortOrder,
 			})
 			if err != nil {
-				ctx.Logger.Println("Failed to sort the collection:", err.Error())
+				ctx.Logger.Println("Failed to sort the collections:", err.Error())
 				return err
 			}
-			ctx.Logger.Println("Successfully sorted the collection")
+			ctx.Logger.Println("Successfully sorted the collections")
 			return nil
 		},
 	}
