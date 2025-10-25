@@ -25,10 +25,11 @@ type AddCollectionPayload struct {
 	Title  string `json:"title,omitempty"`
 	Parent int64  `json:"parent,omitempty"`
 	Public bool   `json:"public,omitempty"`
+	View   string `json:"view,omitempty"`
 }
 
 type SortCollectionPayload struct {
-	Sort string `json:"sort"`
+	Sort string `json:"sort,omitempty"`
 }
 
 type RemoveTagsPayload struct {
@@ -50,6 +51,13 @@ type UpdateBookmarkPayload struct {
 	Note         string   `json:"note,omitempty"`
 	Tags         []string `json:"tags,omitempty"`
 	Title        string   `json:"title,omitempty"`
+}
+
+type UpdateCollectionPayload struct {
+	Title  string `json:"title,omitempty"`
+	Parent int64  `json:"parent,omitempty"`
+	Public bool   `json:"public,omitempty"`
+	View   string `json:"view,omitempty"`
 }
 
 //
@@ -108,6 +116,12 @@ type RemoveCollectionResult struct {
 type SortCollectionsResult struct {
 	Result       bool   `json:"result" yaml:"result"`
 	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+}
+
+type UpdateCollectionResult struct {
+	Result       bool       `json:"result" yaml:"result"`
+	Item         Collection `json:"item" yaml:"item"`
+	ErrorMessage string     `json:"errorMessage" yaml:"errorMessage"`
 }
 
 // Tags

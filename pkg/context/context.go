@@ -10,45 +10,56 @@ import (
 )
 
 type AppContext struct {
-	FlagAddBookmarkCollectionId    int64
-	FlagAddBookmarkExcerpt         string
-	FlagAddBookmarkHighlight       []string
-	FlagAddBookmarkImportant       bool
-	FlagAddBookmarkLink            string
-	FlagAddBookmarkNote            string
-	FlagAddBookmarkTag             []string
-	FlagAddBookmarkTitle           string
-	FlagAddCollectionParent        int64
-	FlagAddCollectionPublic        bool
-	FlagAddCollectionTitle         string
-	FlagCollectionsSortOrder       string
-	FlagNoColor                    bool
-	FlagPageSize                   int
-	FlagPageStyle                  string
-	FlagPrune                      bool
-	FlagRemoveBookmarkId           int64
-	FlagRemoveCollectionId         int64
-	FlagRemoveTagsCollectionId     int64
-	FlagRemoveTagsTagNames         []string
-	FlagRenameTagCollectionId      int64
-	FlagRenameTagNewName           string
-	FlagRenameTagOldName           string
-	FlagUpdateBookmarkBookmarkId   int64
-	FlagUpdateBookmarkCollectionId int64
-	FlagUpdateBookmarkExcerpt      string
-	FlagUpdateBookmarkHighlight    []string
-	FlagUpdateBookmarkImportant    bool
-	FlagUpdateBookmarkLink         string
-	FlagUpdateBookmarkNote         string
-	FlagUpdateBookmarkTag          []string
-	FlagUpdateBookmarkTitle        string
-	Logger                         *logrus.Logger
-	RaindropConfig                 string
-	RaindropHome                   string
-	RD                             *raindrop.Raindrop
-	ValidCollectionsSortOrder      []string
-	ValidStyles                    []string
+	FlagAddBookmarkCollectionId      int64
+	FlagAddBookmarkExcerpt           string
+	FlagAddBookmarkHighlight         []string
+	FlagAddBookmarkImportant         bool
+	FlagAddBookmarkLink              string
+	FlagAddBookmarkNote              string
+	FlagAddBookmarkTag               []string
+	FlagAddBookmarkTitle             string
+	FlagAddCollectionParent          int64
+	FlagAddCollectionPublic          bool
+	FlagAddCollectionTitle           string
+	FlagAddCollectionView            string
+	FlagCollectionsSortOrder         string
+	FlagNoColor                      bool
+	FlagPageSize                     int
+	FlagPageStyle                    string
+	FlagPrune                        bool
+	FlagRemoveBookmarkId             int64
+	FlagRemoveCollectionId           int64
+	FlagRemoveTagsCollectionId       int64
+	FlagRemoveTagsTagNames           []string
+	FlagRenameTagCollectionId        int64
+	FlagRenameTagNewName             string
+	FlagRenameTagOldName             string
+	FlagUpdateBookmarkBookmarkId     int64
+	FlagUpdateBookmarkCollectionId   int64
+	FlagUpdateBookmarkExcerpt        string
+	FlagUpdateBookmarkHighlight      []string
+	FlagUpdateBookmarkImportant      bool
+	FlagUpdateBookmarkLink           string
+	FlagUpdateBookmarkNote           string
+	FlagUpdateBookmarkTag            []string
+	FlagUpdateBookmarkTitle          string
+	FlagUpdateCollectionCollectionId int64
+	FlagUpdateCollectionParent       int64
+	FlagUpdateCollectionPublic       bool
+	FlagUpdateCollectionTitle        string
+	FlagUpdateCollectionView         string
+	Logger                           *logrus.Logger
+	RaindropConfig                   string
+	RaindropHome                     string
+	RD                               *raindrop.Raindrop
+	ValidCollectionsSortOrder        []string
+	ValidCollectionsViews            []string
+	ValidStyles                      []string
 }
+
+//
+// Non-specific
+//
 
 func (ac *AppContext) GetBackupFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolVarP(&ac.FlagPrune, "prune", "p", false, "Prune older [bookmarks|collections]-{timestamp}.yaml files")
@@ -59,23 +70,9 @@ func (ac *AppContext) GetTableFlags(cmd *cobra.Command) {
 	cmd.Flags().IntVarP(&ac.FlagPageSize, "page-size", "p", 40, "The page size for the paginator")
 }
 
-func (ac *AppContext) GetAddCollectionFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&ac.FlagAddCollectionTitle, "title", "t", "", "The title for the new collection")
-	cmd.Flags().Int64VarP(&ac.FlagAddCollectionParent, "parent", "p", 0, "The parent ID of the new collection")
-	cmd.Flags().BoolVarP(&ac.FlagAddCollectionPublic, "public", "", false, "Set the new collection to private")
-
-	cmd.MarkFlagRequired("title")
-}
-
-func (ac *AppContext) GetRemoveCollectionFlags(cmd *cobra.Command) {
-	cmd.Flags().Int64VarP(&ac.FlagRemoveCollectionId, "id", "i", -1, "ID of the collecion to remove")
-
-	cmd.MarkFlagRequired("id")
-}
-
-func (ac *AppContext) GetSortCollectionFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&ac.FlagCollectionsSortOrder, "order", "o", "title", fmt.Sprintf("Sort the collections; one of %s", strings.Join(ac.ValidCollectionsSortOrder, ",")))
-}
+//
+// Bookmarks
+//
 
 func (ac *AppContext) GetAddBookmarkFlags(cmd *cobra.Command) {
 	cmd.Flags().Int64VarP(&ac.FlagAddBookmarkCollectionId, "collection", "c", -1, "The collection ID of the new raindrop (use 'raindrop collections list' to find the ID)")
@@ -92,7 +89,7 @@ func (ac *AppContext) GetAddBookmarkFlags(cmd *cobra.Command) {
 }
 
 func (ac *AppContext) GetRemoveBookmarkFlags(cmd *cobra.Command) {
-	cmd.Flags().Int64VarP(&ac.FlagRemoveBookmarkId, "id", "i", -1, "ID of the bookmark to remove")
+	cmd.Flags().Int64Var(&ac.FlagRemoveBookmarkId, "id", -1, "ID of the bookmark to remove")
 
 	cmd.MarkFlagRequired("id")
 }
@@ -111,7 +108,44 @@ func (ac *AppContext) GetUpdateBookmarkFlags(cmd *cobra.Command) {
 	cmd.MarkFlagRequired("id")
 }
 
-func (ac *AppContext) GetRemoveTagsFlags(cmd *cobra.Command) {
+//
+// Collections
+//
+
+func (ac *AppContext) GetAddCollectionFlags(cmd *cobra.Command) {
+	cmd.Flags().StringVarP(&ac.FlagAddCollectionTitle, "title", "t", "", "The title for the new collection")
+	cmd.Flags().Int64VarP(&ac.FlagAddCollectionParent, "parent", "p", 0, "The parent ID of the new collection")
+	cmd.Flags().BoolVarP(&ac.FlagAddCollectionPublic, "public", "", false, "Make the new collection private")
+	cmd.Flags().StringVarP(&ac.FlagAddCollectionView, "view", "v", "list", fmt.Sprintf("The view for this collection; one of %s", strings.Join(ac.ValidCollectionsViews, ",")))
+
+	cmd.MarkFlagRequired("title")
+}
+
+func (ac *AppContext) GetRemoveCollectionFlags(cmd *cobra.Command) {
+	cmd.Flags().Int64Var(&ac.FlagRemoveCollectionId, "id", -1, "ID of the collecion to remove")
+
+	cmd.MarkFlagRequired("id")
+}
+
+func (ac *AppContext) GetSortCollectionFlags(cmd *cobra.Command) {
+	cmd.Flags().StringVarP(&ac.FlagCollectionsSortOrder, "order", "o", "title", fmt.Sprintf("Sort the collections; one of %s", strings.Join(ac.ValidCollectionsSortOrder, ",")))
+}
+
+func (ac *AppContext) GetUpdateCollectionFlags(cmd *cobra.Command) {
+	cmd.Flags().Int64Var(&ac.FlagUpdateCollectionCollectionId, "id", -1, "The collection ID of the new raindrop (use 'raindrop collections list' to find the ID)")
+	cmd.Flags().StringVarP(&ac.FlagUpdateCollectionTitle, "title", "t", "", "The title for the new collection")
+	cmd.Flags().Int64VarP(&ac.FlagUpdateCollectionParent, "parent", "p", 0, "The parent ID of the new collection")
+	cmd.Flags().BoolVarP(&ac.FlagUpdateCollectionPublic, "public", "", false, "Make the new collection private")
+	cmd.Flags().StringVarP(&ac.FlagUpdateCollectionView, "view", "v", "list", fmt.Sprintf("The view for this collection; one of %s", strings.Join(ac.ValidCollectionsViews, ",")))
+
+	cmd.MarkFlagRequired("id")
+}
+
+//
+// Tags
+//
+
+func (ac *AppContext) GetRenameTagFlags(cmd *cobra.Command) {
 	cmd.Flags().Int64VarP(&ac.FlagRemoveTagsCollectionId, "collection", "c", -1, "Restrict tag replacement to a specific collection ID (use 'raindrop collections list' to find the ID)")
 	cmd.Flags().StringVarP(&ac.FlagRenameTagOldName, "old-name", "o", "", "The existing tag name")
 	cmd.Flags().StringVarP(&ac.FlagRenameTagNewName, "new-name", "n", "", "The new tag name")
@@ -120,7 +154,7 @@ func (ac *AppContext) GetRemoveTagsFlags(cmd *cobra.Command) {
 	cmd.MarkFlagRequired("new-name")
 }
 
-func (ac *AppContext) GetRenameTagFlags(cmd *cobra.Command) {
+func (ac *AppContext) GetRemoveTagsFlags(cmd *cobra.Command) {
 	cmd.Flags().Int64VarP(&ac.FlagRenameTagCollectionId, "collection", "c", -1, "Restrict tag replacement to a specific collection ID (use 'raindrop collections list' to find the ID)")
 	cmd.Flags().StringSliceVarP(&ac.FlagRemoveTagsTagNames, "tag", "t", []string{}, "Tag name to remove; can be used more than once")
 
