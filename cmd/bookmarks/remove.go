@@ -14,7 +14,7 @@ func newRemoveBookmarkCmd(ctx *context.AppContext) (c *cobra.Command) {
 		PreRunE: func(cmdC *cobra.Command, args []string) error {
 			rd, err := raindrop.New(ctx.RaindropHome, ctx.RaindropConfig, ctx.Logger)
 			if err != nil {
-				ctx.Logger.Println("Failed to initialize raindrop:", err)
+				ctx.Logger.Println("Failed to initialize raindrop:", err.Error())
 				return err
 			}
 			ctx.RD = rd
@@ -25,7 +25,7 @@ func newRemoveBookmarkCmd(ctx *context.AppContext) (c *cobra.Command) {
 				ctx.FlagRemoveBookmarkId,
 			)
 			if err != nil {
-				ctx.Logger.Println("Failed to remove the bookmark:", err)
+				ctx.Logger.Println("Failed to remove the bookmark:", err.Error())
 				return err
 			}
 			ctx.Logger.Println("Successfully removed the bookmark")
