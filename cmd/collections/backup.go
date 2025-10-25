@@ -14,7 +14,7 @@ func newBackupCollectionsCmd(ctx *context.AppContext) (c *cobra.Command) {
 		PreRunE: func(cmdC *cobra.Command, args []string) error {
 			rd, err := raindrop.New(ctx.RaindropHome, ctx.RaindropConfig, ctx.Logger)
 			if err != nil {
-				ctx.Logger.Println("Failed to initialize raindrop:", err)
+				ctx.Logger.Println("Failed to initialize raindrop:", err.Error())
 				return err
 			}
 			ctx.RD = rd
@@ -23,7 +23,7 @@ func newBackupCollectionsCmd(ctx *context.AppContext) (c *cobra.Command) {
 		RunE: func(cmdC *cobra.Command, args []string) error {
 			err := ctx.RD.BackupCollections(ctx.FlagPrune)
 			if err != nil {
-				ctx.Logger.Println("Backup failed:", err)
+				ctx.Logger.Println("Backup failed:", err.Error())
 				return err
 			}
 			ctx.Logger.Println("Backup successful")
