@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"strconv"
 
 	"github.com/bananazon/raindrop/pkg/data"
 )
 
-func (ac *APIClient) AddCollection(title string, parentId int64, public bool) (data.AddCollectionResult, error) {
+func (ac *APIClient) AddCollection(payload data.AddCollectionPayload) (data.AddCollectionResult, error) {
 	var (
 		addCollectionResult data.AddCollectionResult
 		addUrl              url.URL
@@ -17,14 +16,13 @@ func (ac *APIClient) AddCollection(title string, parentId int64, public bool) (d
 		response            APIResponse
 	)
 
-	jsonBody := map[string]any{"title": title, "parent": strconv.FormatInt(parentId, 10), "public": public}
-	jsonStr, err := json.Marshal(&jsonBody)
+	jsonData, err := json.Marshal(&payload)
 	if err != nil {
 		return addCollectionResult, err
 	}
 
 	addUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/collection", apiVersion)}
-	response = ac.Request(APIRequest{Method: "POST", URL: addUrl, Body: string(jsonStr)})
+	response = ac.Request(APIRequest{Method: "POST", URL: addUrl, Body: string(jsonData)})
 	if !response.Success {
 		return addCollectionResult, response.Error
 	}
@@ -67,8 +65,7 @@ func (ac *APIClient) ListCollections() (data.ListCollectionsResult, error) {
 	return listCollectionsResult, nil
 }
 
-func (ac *APIClient) SortCollections(sortOrder string) (data.SortCollectionsResult, error) {
-
+func (ac *APIClient) SortCollections(payload data.SortCollectionPayload) (data.SortCollectionsResult, error) {
 	var (
 		err                   error
 		sortCollectionsResult data.SortCollectionsResult
@@ -76,14 +73,13 @@ func (ac *APIClient) SortCollections(sortOrder string) (data.SortCollectionsResu
 		response              APIResponse
 	)
 
-	jsonBody := map[string]any{"sort": sortOrder}
-	jsonBytes, err := json.Marshal(&jsonBody)
+	jsonData, err := json.Marshal(&payload)
 	if err != nil {
 		return sortCollectionsResult, err
 	}
 
 	sortUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/collections", apiVersion)}
-	response = ac.Request(APIRequest{Method: "PUT", URL: sortUrl, Body: string(jsonBytes)})
+	response = ac.Request(APIRequest{Method: "PUT", URL: sortUrl, Body: string(jsonData)})
 	if !response.Success {
 		return sortCollectionsResult, response.Error
 	}
