@@ -21,7 +21,7 @@ func (ac *APIClient) AddCollection(payload data.AddCollectionPayload) (data.AddC
 		return addCollectionResult, err
 	}
 
-	addUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/collection", apiVersion)}
+	addUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("rest/%s/collection", apiVersion)}
 	response = ac.Request(APIRequest{Method: "POST", URL: addUrl, Body: string(jsonData)})
 	if !response.Success {
 		return addCollectionResult, response.Error
@@ -47,7 +47,7 @@ func (ac *APIClient) ListCollections() (data.ListCollectionsResult, error) {
 		response              APIResponse
 	)
 
-	listUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/collections", apiVersion)}
+	listUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("rest/%s/collections", apiVersion)}
 	response = ac.Request(APIRequest{Method: "GET", URL: listUrl})
 	if !response.Success {
 		return listCollectionsResult, response.Error
@@ -78,7 +78,7 @@ func (ac *APIClient) SortCollections(payload data.SortCollectionPayload) (data.S
 		return sortCollectionsResult, err
 	}
 
-	sortUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/collections", apiVersion)}
+	sortUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("rest/%s/collections", apiVersion)}
 	response = ac.Request(APIRequest{Method: "PUT", URL: sortUrl, Body: string(jsonData)})
 	if !response.Success {
 		return sortCollectionsResult, response.Error
@@ -103,7 +103,7 @@ func (ac *APIClient) RemoveCollection(collectionId int64) (data.RemoveCollection
 		removeUrl              url.URL
 		response               APIResponse
 	)
-	removeUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/collection/%d", apiVersion, collectionId)}
+	removeUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("rest/%s/collection/%d", apiVersion, collectionId)}
 	response = ac.Request(APIRequest{Method: "DELETE", URL: removeUrl})
 	if !response.Success {
 		return removeCollectionResult, response.Error
@@ -134,7 +134,7 @@ func (ac *APIClient) UpdateCollection(collectionId int64, payload data.UpdateCol
 		return updateCollectionResult, err
 	}
 
-	updateUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/collection/%d", apiVersion, collectionId)}
+	updateUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("rest/%s/collection/%d", apiVersion, collectionId)}
 	response = ac.Request(APIRequest{Method: "PUT", URL: updateUrl, Body: string(jsonData)})
 	if !response.Success {
 		return updateCollectionResult, response.Error

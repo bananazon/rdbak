@@ -23,7 +23,7 @@ func (ac *APIClient) DownloadFileIfMissing(title string, id uint64, exportDir st
 	downloadUrl := url.URL{
 		Scheme:   "https",
 		Host:     apiBase,
-		Path:     fmt.Sprintf("%s/raindrop/%d/cache", apiVersion, id),
+		Path:     fmt.Sprintf("rest/%s/raindrop/%d/cache", apiVersion, id),
 		RawQuery: "download",
 	}
 	url := downloadUrl.String()

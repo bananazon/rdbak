@@ -22,6 +22,7 @@ type APIClient struct {
 	Logger         *logrus.Logger
 	Client         *http.Client
 	ReDownloadName *regexp.Regexp
+	Token          string
 }
 
 func NewApiClient(logger *logrus.Logger) *APIClient {

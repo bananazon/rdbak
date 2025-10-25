@@ -22,7 +22,7 @@ func (ac *APIClient) AddBookmark(payload data.AddBookmarkPayload) (data.AddBookm
 		return addBookmarkResult, err
 	}
 
-	addUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/raindrop", apiVersion)}
+	addUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("rest/%s/raindrop", apiVersion)}
 	response = ac.Request(APIRequest{Method: "POST", URL: addUrl, Body: string(jsonData)})
 	if !response.Success {
 		return addBookmarkResult, response.Error
@@ -49,7 +49,7 @@ func (ac *APIClient) ListBookmarks(page int) (data.ListBookmarksResult, error) {
 		response            APIResponse
 	)
 	queryMap = map[string]string{"sort": "-lastUpdate&perpage", "perpage": strconv.Itoa(PageSize), "page": strconv.Itoa(page), "version": "2"}
-	listUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/raindrops/0", apiVersion), RawQuery: MapToQueryString(queryMap)}
+	listUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("rest/%s/raindrops/0", apiVersion), RawQuery: MapToQueryString(queryMap)}
 	response = ac.Request(APIRequest{Method: "GET", URL: listUrl})
 	if !response.Success {
 		return listBookmarksResult, response.Error
@@ -74,7 +74,7 @@ func (ac *APIClient) RemoveBookmark(bookmarkId int64) (data.RemoveBookmarkResult
 		removeUrl            url.URL
 		response             APIResponse
 	)
-	removeUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/raindrop/%d", apiVersion, bookmarkId)}
+	removeUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("rest/%s/raindrop/%d", apiVersion, bookmarkId)}
 	response = ac.Request(APIRequest{Method: "DELETE", URL: removeUrl})
 	if !response.Success {
 		return removeBookmarkResult, response.Error
@@ -105,7 +105,7 @@ func (ac *APIClient) UpdateBookmark(bookmarkId int64, payload data.UpdateBookmar
 		return updateBookmarkResult, err
 	}
 
-	updateUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/raindrop/%d", apiVersion, bookmarkId)}
+	updateUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("rest/%s/raindrop/%d", apiVersion, bookmarkId)}
 	response = ac.Request(APIRequest{Method: "PUT", URL: updateUrl, Body: string(jsonData)})
 	if !response.Success {
 		return updateBookmarkResult, response.Error

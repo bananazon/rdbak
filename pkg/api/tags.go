@@ -16,7 +16,7 @@ func (ac *APIClient) ListTags() (data.ListTagsResult, error) {
 		response       APIResponse
 	)
 
-	listUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/tags", apiVersion)}
+	listUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("rest/%s/tags", apiVersion)}
 	response = ac.Request(APIRequest{Method: "GET", URL: listUrl})
 	if !response.Success {
 		return listTagsResult, response.Error
@@ -44,9 +44,9 @@ func (ac *APIClient) RenameTag(payload data.RenameTagPayload) (data.RenameTagRes
 	)
 
 	if payload.CollectionId >= 0 {
-		urlPath = fmt.Sprintf("%s/tags/%d", apiVersion, payload.CollectionId)
+		urlPath = fmt.Sprintf("rest/%s/tags/%d", apiVersion, payload.CollectionId)
 	} else {
-		urlPath = fmt.Sprintf("%s/tags", apiVersion)
+		urlPath = fmt.Sprintf("rest/%s/tags", apiVersion)
 	}
 
 	jsonData, err := json.Marshal(payload)
@@ -83,9 +83,9 @@ func (ac *APIClient) RemoveTags(payload data.RemoveTagsPayload) (data.RemoveTags
 	)
 
 	if payload.CollectionId >= 0 {
-		urlPath = fmt.Sprintf("%s/tags/%d", apiVersion, payload.CollectionId)
+		urlPath = fmt.Sprintf("rest/%s/tags/%d", apiVersion, payload.CollectionId)
 	} else {
-		urlPath = fmt.Sprintf("%s/tags", apiVersion)
+		urlPath = fmt.Sprintf("rest/%s/tags", apiVersion)
 	}
 
 	jsonData, err := json.Marshal(payload)

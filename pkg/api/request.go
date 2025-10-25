@@ -48,6 +48,7 @@ func (ac *APIClient) Request(request APIRequest) (response APIResponse) {
 	}
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", ac.Token))
 
 	resp, err := ac.Client.Do(req)
 	if err != nil {
