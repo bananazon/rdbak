@@ -49,6 +49,7 @@ func New(raindropRoot string, configPath string, logger *logrus.Logger) (rd *Rai
 		RaindropRoot: raindropRoot,
 	}
 	rd.Bookmarks = make(map[uint64]*data.Bookmark)
+	rd.Collections = make(map[uint64]*data.Collection)
 
 	err = rd.ParseConfig()
 	if err != nil {
