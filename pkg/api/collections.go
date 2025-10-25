@@ -115,8 +115,39 @@ func (ac *APIClient) RemoveCollection(collectionId int64) (data.RemoveCollection
 	}
 
 	if !removeCollectionResult.Result {
-		return removeCollectionResult, fmt.Errorf("remove raindrop returned false: %s", removeCollectionResult.ErrorMessage)
+		return removeCollectionResult, fmt.Errorf("remove collection returned false: %s", removeCollectionResult.ErrorMessage)
 	}
 
 	return removeCollectionResult, nil
+}
+
+func (ac *APIClient) UpdateCollection(collectionId int64, payload data.UpdateCollectionPayload) (data.UpdateCollectionResult, error) {
+	var (
+		err                    error
+		response               APIResponse
+		updateCollectionResult data.UpdateCollectionResult
+		updateUrl              url.URL
+	)
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return updateCollectionResult, err
+	}
+
+	updateUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/collection/%d", apiVersion, collectionId)}
+	response = ac.Request(APIRequest{Method: "PUT", URL: updateUrl, Body: string(jsonData)})
+	if !response.Success {
+		return updateCollectionResult, response.Error
+	}
+
+	err = json.Unmarshal(response.Body, &updateCollectionResult)
+	if err != nil {
+		return updateCollectionResult, err
+	}
+
+	if !updateCollectionResult.Result {
+		return updateCollectionResult, fmt.Errorf("update collection returned false: %s", updateCollectionResult.ErrorMessage)
+	}
+
+	return updateCollectionResult, nil
 }
