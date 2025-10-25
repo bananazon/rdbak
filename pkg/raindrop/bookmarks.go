@@ -21,8 +21,8 @@ func (r *Raindrop) ListBookmarks() (bookmarks map[uint64]*data.Bookmark, err err
 func (r *Raindrop) LoadBookmarks() (err error) {
 	bookmarks := make([]*data.Bookmark, 0)
 
-	if util.PathExists(r.Config.BookmarksFile) {
-		contents, err := os.ReadFile(r.Config.BookmarksFile)
+	if util.PathExists(r.BookmarksFile) {
+		contents, err := os.ReadFile(r.BookmarksFile)
 		if err != nil {
 			return err
 		}

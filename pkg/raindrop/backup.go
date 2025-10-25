@@ -39,7 +39,7 @@ func (r *Raindrop) Backup(flagPrune bool) (err error) {
 	failedIds := make(map[uint64]bool)
 
 	for _, bookmark := range newBookmarks {
-		downloaded, err := r.API.DownloadFileIfMissing(bookmark.Title, bookmark.Id, r.Config.ExportDir)
+		downloaded, err := r.API.DownloadFileIfMissing(bookmark.Title, bookmark.Id, r.RaindropRoot)
 		if err != nil {
 			r.Logger.Warn(err.Error())
 			failedIds[bookmark.Id] = true
@@ -51,7 +51,7 @@ func (r *Raindrop) Backup(flagPrune bool) (err error) {
 	}
 
 	for _, bookmark := range changedBookmarks {
-		downloaded, err := r.API.DownloadFileIfMissing(bookmark.Title, bookmark.Id, r.Config.ExportDir)
+		downloaded, err := r.API.DownloadFileIfMissing(bookmark.Title, bookmark.Id, r.RaindropRoot)
 		if err != nil {
 			r.Logger.Warn(err.Error())
 			failedIds[bookmark.Id] = true
@@ -98,7 +98,7 @@ func (r *Raindrop) Backup(flagPrune bool) (err error) {
 
 	// Delete files for removed bookmarks
 	for bookmarkId := range removedBookmarks {
-		targetDir := filepath.Join(r.Config.ExportDir, fmt.Sprintf("%d", bookmarkId))
+		targetDir := filepath.Join(r.RaindropRoot, fmt.Sprintf("%d", bookmarkId))
 		r.Logger.Infof("Deleting %s because the bookmark was removed.", targetDir)
 		err := os.RemoveAll(targetDir)
 		if err != nil {
@@ -155,7 +155,7 @@ func (r *Raindrop) PruneBackups() {
 	if r.PruneOlder {
 		r.Logger.Info("Looking for outdated backup files to prune.")
 
-		pattern := fmt.Sprintf("%s/%s", r.HomePath, "bookmarks-*.yaml")
+		pattern := fmt.Sprintf("%s/%s", r.RaindropRoot, "bookmarks-*.yaml")
 		timePeriod := 1 * Week
 
 		oldFiles, err := util.FindOldFiles(pattern, timePeriod)
@@ -188,19 +188,19 @@ func (r *Raindrop) SaveBookmarks() (err error) {
 		return nil
 	}
 
-	if util.PathExists(r.Config.BookmarksFile) {
-		backupFilename := filepath.Join(r.HomePath, fmt.Sprintf("bookmarks-%d.yaml", time.Now().Unix()))
+	if util.PathExists(r.BookmarksFile) {
+		backupFilename := filepath.Join(r.RaindropRoot, fmt.Sprintf("bookmarks-%d.yaml", time.Now().Unix()))
 
-		r.Logger.Infof("Copying %s to %s.", r.Config.BookmarksFile, backupFilename)
-		r.Logger.Infof("Saving bookmarks to %s.", r.Config.BookmarksFile)
+		r.Logger.Infof("Copying %s to %s.", r.BookmarksFile, backupFilename)
+		r.Logger.Infof("Saving bookmarks to %s.", r.BookmarksFile)
 
-		err = os.Rename(r.Config.BookmarksFile, backupFilename)
+		err = os.Rename(r.BookmarksFile, backupFilename)
 		if err != nil {
-			return fmt.Errorf("failed to rename %s to %s: %s", r.Config.BookmarksFile, backupFilename, err.Error())
+			return fmt.Errorf("failed to rename %s to %s: %s", r.BookmarksFile, backupFilename, err.Error())
 		}
 	}
 
-	err = os.WriteFile(r.Config.BookmarksFile, yamlBookmarks, 0600)
+	err = os.WriteFile(r.BookmarksFile, yamlBookmarks, 0600)
 	if err != nil {
 		return err
 	}

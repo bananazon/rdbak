@@ -3,6 +3,7 @@ package raindrop
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/bananazon/raindrop/pkg/api"
 	"github.com/bananazon/raindrop/pkg/data"
@@ -14,30 +15,30 @@ type Config struct {
 	Email             string `yaml:"email"`
 	Password          string `yaml:"password,omitempty"`
 	EncryptedPassword string `yaml:"encryptedPassword,omitempty"`
-	BookmarksFile     string `yaml:"bookmarksFile"`
-	ExportDir         string `yaml:"exportDir"`
 }
 
 type Raindrop struct {
 	API              *api.APIClient
+	Bookmarks        map[uint64]*data.Bookmark
+	BookmarksFile    string
 	Collections      map[uint64]*data.Collection
+	CollectionsFile  string
 	Config           *Config
 	ConfigPath       string
-	HomePath         string
+	RaindropRoot     string
 	Logger           *logrus.Logger
 	PruneOlder       bool
-	Bookmarks        map[uint64]*data.Bookmark
 	UpdatedBookmarks []*data.Bookmark
 }
 
-func New(homePath string, configPath string, logger *logrus.Logger) (rd *Raindrop, err error) {
+func New(raindropRoot string, configPath string, logger *logrus.Logger) (rd *Raindrop, err error) {
 	rd = &Raindrop{
-		API:        api.NewApiClient(logger),
-		ConfigPath: configPath,
-		Config:     &Config{},
-		HomePath:   homePath,
-		Logger:     logger,
-		PruneOlder: false,
+		API:          api.NewApiClient(logger),
+		Config:       &Config{},
+		ConfigPath:   configPath,
+		Logger:       logger,
+		PruneOlder:   false,
+		RaindropRoot: raindropRoot,
 	}
 	rd.Bookmarks = make(map[uint64]*data.Bookmark)
 
@@ -45,6 +46,9 @@ func New(homePath string, configPath string, logger *logrus.Logger) (rd *Raindro
 	if err != nil {
 		return rd, err
 	}
+
+	rd.BookmarksFile = filepath.Join(raindropRoot, "bookmarks.yaml")
+	rd.CollectionsFile = filepath.Join(raindropRoot, "collections.yaml")
 
 	err = rd.API.Login(rd.Config.Email, rd.Config.Password)
 	if err != nil {
@@ -62,10 +66,6 @@ func (r *Raindrop) ParseConfig() (err error) {
 
 	if err = yaml.Unmarshal(contents, r.Config); err != nil {
 		return fmt.Errorf("failed to parse %s", r.ConfigPath)
-	}
-
-	if len(r.Config.BookmarksFile) == 0 {
-		return fmt.Errorf("the bookmarksFile field in the config is empty; please fix this")
 	}
 
 	if len(r.Config.Password) == 0 {
