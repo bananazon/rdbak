@@ -6,9 +6,112 @@ type Cache struct {
 	Status string `json:"status" yaml:"status"`
 }
 
-/*
-Refs
-*/
+//
+// Payloads
+//
+
+type AddBookmarkPayload struct {
+	CollectionId int64    `json:"collectionId,omitempty"`
+	Excerpt      string   `json:"excerpt,omitempty"`
+	Highlights   []string `json:"highlights,omitempty"`
+	Link         string   `json:"link,omitempty"`
+	Note         string   `json:"note,omitempty"`
+	Tags         []string `json:"tags,omitempty"`
+	Title        string   `json:"title,omitempty"`
+}
+
+type AddCollectionPayload struct {
+	Title  string `json:"title,omitempty"`
+	Parent int64  `json:"parent,omitempty"`
+	Public bool   `json:"public,omitempty"`
+}
+
+type SortCollectionPayload struct {
+	Sort string `json:"sort"`
+}
+
+type RemoveTagsPayload struct {
+	CollectionId int64    `json:"collectionId,omitempty"`
+	Tags         []string `json:"tags,omitempty"`
+}
+type RenameTagPayload struct {
+	CollectionId int64    `json:"collectionId,omitempty"`
+	NewName      string   `json:"replace,omitempty"`
+	OldName      []string `json:"tags,omitempty"`
+}
+
+//
+// Results
+//
+
+// Login
+type LoginResult struct {
+	Result       bool   `json:"result" yaml:"result"`
+	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+}
+
+// Bookmarks
+type AddBookmarkResult struct {
+	Result       bool     `json:"result" yaml:"result"`
+	Item         Bookmark `json:"item" yaml:"item"`
+	ErrorMessage string   `json:"errorMessage" yaml:"errorMessage"`
+}
+
+type ListBookmarksResult struct {
+	Result       bool        `json:"result" yaml:"result"`
+	Items        []*Bookmark `json:"items" yaml:"items"`
+	Count        int         `json:"count" yaml:"count"`
+	ErrorMessage string      `json:"errorMessage" yaml:"errorMessage"`
+}
+type RemoveBookmarkResult struct {
+	Result       bool   `json:"result" yaml:"result"`
+	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+}
+
+// Collections
+type AddCollectionResult struct {
+	Result       bool       `json:"result" yaml:"result"`
+	Item         Collection `json:"item" yaml:"item"`
+	ErrorMessage string     `json:"errorMessage" yaml:"errorMessage"`
+}
+
+type ListCollectionsResult struct {
+	Result       bool          `json:"result" yaml:"result"`
+	Items        []*Collection `json:"items" yaml:"items"`
+	Count        int           `json:"count" yaml:"count"`
+	ErrorMessage string        `json:"errorMessage" yaml:"errorMessage"`
+}
+
+type RemoveCollectionResult struct {
+	Result       bool   `json:"result" yaml:"result"`
+	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+}
+
+type SortCollectionsResult struct {
+	Result       bool   `json:"result" yaml:"result"`
+	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+}
+
+// Tags
+type ListTagsResult struct {
+	Result       bool   `json:"result" yaml:"result"`
+	Items        []*Tag `json:"items" yaml:"items"`
+	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+}
+
+type RemoveTagsResult struct {
+	Result       bool   `json:"result" yaml:"result"`
+	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+}
+
+type RenameTagResult struct {
+	Result       bool   `json:"result" yaml:"result"`
+	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+}
+
+//
+// Refs
+//
 
 type CollectionRef struct {
 	Ref  string `json:"$ref" yaml:"$ref"`
@@ -38,57 +141,9 @@ type UserRef struct {
 	Id  int64  `json:"$id" yaml:"$id"`
 }
 
-/*
-Results
-*/
-
-type LoginResult struct {
-	Result       bool   `json:"result" yaml:"result"`
-	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
-}
-
-type AddBookmarkResult struct {
-	Result       bool     `json:"result" yaml:"result"`
-	ErrorMessage string   `json:"errorMessage" yaml:"errorMessage"`
-	Item         Bookmark `json:"item" yaml:"item"`
-}
-
-type ListBookmarksResult struct {
-	Result       bool        `json:"result" yaml:"result"`
-	Items        []*Bookmark `json:"items" yaml:"items"`
-	Count        int         `json:"count" yaml:"count"`
-	ErrorMessage string      `json:"errorMessage" yaml:"errorMessage"`
-}
-type RemoveBookmarkResult struct {
-	Result       bool   `json:"result" yaml:"result"`
-	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
-}
-
-type AddCollectionResult struct {
-	Result       bool       `json:"result" yaml:"result"`
-	ErrorMessage string     `json:"errorMessage" yaml:"errorMessage"`
-	Item         Collection `json:"item" yaml:"item"`
-}
-
-type ListCollectionsResult struct {
-	Result       bool          `json:"result" yaml:"result"`
-	Items        []*Collection `json:"items" yaml:"items"`
-	Count        int           `json:"count" yaml:"count"`
-	ErrorMessage string        `json:"errorMessage" yaml:"errorMessage"`
-}
-type RemoveCollectionResult struct {
-	Result       bool   `json:"result" yaml:"result"`
-	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
-}
-
-type SortCollectionsResult struct {
-	Result       bool   `json:"result" yaml:"result"`
-	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
-}
-
-/*
-Raindrop
-*/
+//
+// Raindrop
+//
 
 type Bookmark struct {
 	Id           uint64        `json:"_id" yaml:"_id"`
@@ -115,9 +170,9 @@ type Bookmark struct {
 	Cache        Cache         `json:"cache" yaml:"cache"`
 }
 
-/*
-Collection
-*/
+//
+// Collection
+//
 
 type CollectionAccess struct {
 	For       uint64 `json:"for" yaml:"for"`
@@ -146,4 +201,13 @@ type Collection struct {
 	Color       string           `json:"color" yaml:"color"`
 	Access      CollectionAccess `json:"access" yaml:"access"`
 	Author      bool             `json:"author" yaml:"autor"`
+}
+
+//
+// Tag
+//
+
+type Tag struct {
+	Id    string `json:"_id" yaml:"_id"`
+	Count uint64 `json:"count" yaml:"count"`
 }
