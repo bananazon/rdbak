@@ -10,21 +10,21 @@ import (
 	"github.com/bananazon/raindrop/pkg/crypt"
 )
 
-func (r *Raindrop) EncryptPassword() (err error) {
-	ciphertext, err := crypt.Encrypt(r.Config.Password)
+func (r *Raindrop) EncryptToken() (err error) {
+	ciphertext, err := crypt.Encrypt(r.Config.Token)
 	if err != nil {
 		return err
 	}
-	r.Config.EncryptedPassword = ciphertext
+	r.Config.EncryptedToken = ciphertext
 	return nil
 }
 
-func (r *Raindrop) DecryptPassword() (err error) {
-	plaintext, err := crypt.Decrypt(r.Config.EncryptedPassword)
+func (r *Raindrop) DecryptToken() (err error) {
+	plaintext, err := crypt.Decrypt(r.Config.EncryptedToken)
 	if err != nil {
 		return err
 	}
-	r.Config.Password = plaintext
+	r.Config.Token = plaintext
 	return nil
 }
 
