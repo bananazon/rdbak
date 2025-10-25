@@ -36,10 +36,10 @@ func newUpdateBookmarkCmd(ctx *context.AppContext) (c *cobra.Command) {
 				},
 			)
 			if err != nil {
-				ctx.Logger.Println("Failed to add the bookmark:", err.Error())
+				ctx.Logger.Println("Failed to update the bookmark:", err.Error())
 				return err
 			}
-			ctx.Logger.Println("Successfully added the bookmark")
+			ctx.Logger.Println("Successfully updated the bookmark")
 			return nil
 		},
 	}
