@@ -18,6 +18,7 @@ func NewCollectionsCmd(ctx *context.AppContext) (cmdC *cobra.Command) {
 	cmdC.AddCommand(newListCollectionsCmd(ctx))
 	cmdC.AddCommand(newRemoveCollectionCmd(ctx))
 	cmdC.AddCommand(newSortCollectionsCmd(ctx))
+	cmdC.AddCommand(newUpdateCollectionCmd(ctx))
 
 	return cmdC
 }
