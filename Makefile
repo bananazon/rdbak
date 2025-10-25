@@ -2,7 +2,7 @@ GOPATH := $(shell go env GOPATH)
 GOOS := $(shell go env GOOS)
 GOARCH := $(shell go env GOARCH)
 GOBIN := $(shell go env GOBIN)
-RAINDROP_VERSION := "0.5.0"
+RAINDROP_VERSION := "0.5.1"
 
 GOOS ?= $(shell uname | tr '[:upper:]' '[:lower:]')
 GOARCH ?=$(shell arch)
