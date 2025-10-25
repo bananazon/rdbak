@@ -34,7 +34,7 @@ func newRemoveTagsCmd(ctx *context.AppContext) (c *cobra.Command) {
 		},
 	}
 
-	ctx.GetRenameTagFlags(c)
+	ctx.GetRemoveTagsFlags(c)
 
 	return c
 }
