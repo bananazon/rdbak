@@ -9,9 +9,8 @@ import (
 
 func newRenameTagCmd(ctx *context.AppContext) (c *cobra.Command) {
 	c = &cobra.Command{
-		Use:     "rename",
-		Aliases: []string{"r"},
-		Short:   "Rename a tag in your raindrop.io account",
+		Use:   "rename",
+		Short: "Rename a tag in your raindrop.io account",
 		PreRunE: func(cmdC *cobra.Command, args []string) error {
 			rd, err := raindrop.New(ctx.RaindropHome, ctx.RaindropConfig, ctx.Logger)
 			if err != nil {
