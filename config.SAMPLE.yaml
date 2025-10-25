@@ -1,4 +1,2 @@
 email: user@example.com
 password: mysupersecretpassword
-bookmarksFile: /home/dummy/.config/raindrop/bookmarks.yaml
-exportDir: /home/dummy/.config/raindrop
