@@ -39,8 +39,8 @@ type Raindrop struct {
 	UpdatedCollections []*data.Collection
 }
 
-func New(raindropRoot string, configPath string, logger *logrus.Logger) (rd *Raindrop, err error) {
-	rd = &Raindrop{
+func New(raindropRoot string, configPath string, logger *logrus.Logger) (r *Raindrop, err error) {
+	r = &Raindrop{
 		API:          api.NewApiClient(logger),
 		Config:       &Config{},
 		ConfigPath:   configPath,
@@ -48,23 +48,23 @@ func New(raindropRoot string, configPath string, logger *logrus.Logger) (rd *Rai
 		PruneOlder:   false,
 		RaindropRoot: raindropRoot,
 	}
-	rd.Bookmarks = make(map[uint64]*data.Bookmark)
-	rd.Collections = make(map[uint64]*data.Collection)
+	r.Bookmarks = make(map[uint64]*data.Bookmark)
+	r.Collections = make(map[uint64]*data.Collection)
 
-	err = rd.ParseConfig()
+	err = r.ParseConfig()
 	if err != nil {
-		return rd, err
+		return r, err
 	}
 
-	rd.BookmarksFile = filepath.Join(raindropRoot, "bookmarks.yaml")
-	rd.CollectionsFile = filepath.Join(raindropRoot, "collections.yaml")
+	r.BookmarksFile = filepath.Join(raindropRoot, "bookmarks.yaml")
+	r.CollectionsFile = filepath.Join(raindropRoot, "collections.yaml")
 
-	err = rd.API.Login(rd.Config.Email, rd.Config.Password)
+	err = r.API.Login(r.Config.Email, r.Config.Password)
 	if err != nil {
-		return rd, err
+		return r, err
 	}
 
-	return rd, nil
+	return r, nil
 }
 
 func (r *Raindrop) ParseConfig() (err error) {
