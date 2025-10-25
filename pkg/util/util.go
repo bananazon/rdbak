@@ -3,11 +3,8 @@ package util
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"os/user"
-	"path/filepath"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
@@ -99,31 +96,6 @@ func FileSize(filename string) int64 {
 	} else {
 		return info.Size()
 	}
-}
-
-// Return a list of files that is older than olderThan
-func FindOldFiles(pattern string, olderThan time.Duration) ([]string, error) {
-	files, err := filepath.Glob(pattern)
-	if err != nil {
-		return nil, fmt.Errorf("glob error: %w", err)
-	}
-
-	var oldFiles []string
-	cutoff := time.Now().Add(-olderThan)
-
-	for _, file := range files {
-		info, err := os.Stat(file)
-		if err != nil {
-			log.Printf("skipping %s: %v", file, err)
-			continue
-		}
-
-		if !info.IsDir() && info.ModTime().Before(cutoff) {
-			oldFiles = append(oldFiles, file)
-		}
-	}
-
-	return oldFiles, nil
 }
 
 func GetHome() (homeDir string, err error) {
