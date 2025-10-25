@@ -20,7 +20,7 @@ func newListBookmarksCmd(ctx *context.AppContext) (c *cobra.Command) {
 		PreRunE: func(cmdC *cobra.Command, args []string) error {
 			rd, err := raindrop.New(ctx.RaindropHome, ctx.RaindropConfig, ctx.Logger)
 			if err != nil {
-				ctx.Logger.Println("Failed to initialize raindrop:", err)
+				ctx.Logger.Println("Failed to initialize raindrop:", err.Error())
 				return err
 			}
 			ctx.RD = rd
@@ -29,13 +29,13 @@ func newListBookmarksCmd(ctx *context.AppContext) (c *cobra.Command) {
 		RunE: func(cmdC *cobra.Command, args []string) error {
 			bookmarks, err := ctx.RD.ListBookmarks()
 			if err != nil {
-				ctx.Logger.Println("Failed to get a list of bookmarks:", err)
+				ctx.Logger.Println("Failed to get a list of bookmarks:", err.Error())
 				return err
 			}
 
 			collections, err := ctx.RD.ListCollections()
 			if err != nil {
-				ctx.Logger.Println("Failed to get a list of collections:", err)
+				ctx.Logger.Println("Failed to get a list of collections:", err.Error())
 				return err
 			}
 
