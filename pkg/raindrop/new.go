@@ -4,12 +4,19 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/bananazon/raindrop/pkg/api"
 	"github.com/bananazon/raindrop/pkg/data"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
+
+const Second = time.Second
+const Minute = time.Minute
+const Hour = time.Hour
+const Day = 24 * time.Hour
+const Week = 7 * Day
 
 type Config struct {
 	Email             string `yaml:"email"`
@@ -18,17 +25,18 @@ type Config struct {
 }
 
 type Raindrop struct {
-	API              *api.APIClient
-	Bookmarks        map[uint64]*data.Bookmark
-	BookmarksFile    string
-	Collections      map[uint64]*data.Collection
-	CollectionsFile  string
-	Config           *Config
-	ConfigPath       string
-	RaindropRoot     string
-	Logger           *logrus.Logger
-	PruneOlder       bool
-	UpdatedBookmarks []*data.Bookmark
+	API                *api.APIClient
+	Bookmarks          map[uint64]*data.Bookmark
+	BookmarksFile      string
+	Collections        map[uint64]*data.Collection
+	CollectionsFile    string
+	Config             *Config
+	ConfigPath         string
+	RaindropRoot       string
+	Logger             *logrus.Logger
+	PruneOlder         bool
+	UpdatedBookmarks   []*data.Bookmark
+	UpdatedCollections []*data.Collection
 }
 
 func New(raindropRoot string, configPath string, logger *logrus.Logger) (rd *Raindrop, err error) {
