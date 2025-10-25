@@ -91,3 +91,36 @@ func (ac *APIClient) RemoveBookmark(bookmarkId int64) (data.RemoveBookmarkResult
 
 	return removeBookmarkResult, nil
 }
+
+func (ac *APIClient) UpdateBookmark(bookmarkId int64, payload data.UpdateBookmarkPayload) (data.UpdateBookmarkResult, error) {
+	var (
+		err                  error
+		response             APIResponse
+		updateBookmarkResult data.UpdateBookmarkResult
+		updateUrl            url.URL
+	)
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return updateBookmarkResult, err
+	}
+
+	updateUrl = url.URL{Scheme: "https", Host: apiBase, Path: fmt.Sprintf("%s/raindrop/%d", apiVersion, bookmarkId)}
+	response = ac.Request(APIRequest{Method: "PUT", URL: updateUrl, Body: string(jsonData)})
+	if !response.Success {
+		return updateBookmarkResult, response.Error
+	}
+
+	fmt.Println(string(response.Body))
+
+	err = json.Unmarshal(response.Body, &updateBookmarkResult)
+	if err != nil {
+		return updateBookmarkResult, err
+	}
+
+	if !updateBookmarkResult.Result {
+		return updateBookmarkResult, fmt.Errorf("add bookmark returned false: %s", updateBookmarkResult.ErrorMessage)
+	}
+
+	return updateBookmarkResult, nil
+}

@@ -10,34 +10,44 @@ import (
 )
 
 type AppContext struct {
-	FlagAddBookmarkCollectionId int64
-	FlagAddBookmarkExcerpt      string
-	FlagAddBookmarkHighlight    []string
-	FlagAddBookmarkLink         string
-	FlagAddBookmarkNote         string
-	FlagAddBookmarkTag          []string
-	FlagAddBookmarkTitle        string
-	FlagAddCollectionParent     int64
-	FlagAddCollectionPublic     bool
-	FlagAddCollectionTitle      string
-	FlagCollectionsSortOrder    string
-	FlagNoColor                 bool
-	FlagPageSize                int
-	FlagPageStyle               string
-	FlagPrune                   bool
-	FlagRemoveBookmarkId        int64
-	FlagRemoveCollectionId      int64
-	FlagRemoveTagsCollectionId  int64
-	FlagRemoveTagsTagNames      []string
-	FlagRenameTagCollectionId   int64
-	FlagRenameTagNewName        string
-	FlagRenameTagOldName        string
-	Logger                      *logrus.Logger
-	RaindropConfig              string
-	RaindropHome                string
-	RD                          *raindrop.Raindrop
-	ValidCollectionsSortOrder   []string
-	ValidStyles                 []string
+	FlagAddBookmarkCollectionId    int64
+	FlagAddBookmarkExcerpt         string
+	FlagAddBookmarkHighlight       []string
+	FlagAddBookmarkImportant       bool
+	FlagAddBookmarkLink            string
+	FlagAddBookmarkNote            string
+	FlagAddBookmarkTag             []string
+	FlagAddBookmarkTitle           string
+	FlagAddCollectionParent        int64
+	FlagAddCollectionPublic        bool
+	FlagAddCollectionTitle         string
+	FlagCollectionsSortOrder       string
+	FlagNoColor                    bool
+	FlagPageSize                   int
+	FlagPageStyle                  string
+	FlagPrune                      bool
+	FlagRemoveBookmarkId           int64
+	FlagRemoveCollectionId         int64
+	FlagRemoveTagsCollectionId     int64
+	FlagRemoveTagsTagNames         []string
+	FlagRenameTagCollectionId      int64
+	FlagRenameTagNewName           string
+	FlagRenameTagOldName           string
+	FlagUpdateBookmarkBookmarkId   int64
+	FlagUpdateBookmarkCollectionId int64
+	FlagUpdateBookmarkExcerpt      string
+	FlagUpdateBookmarkHighlight    []string
+	FlagUpdateBookmarkImportant    bool
+	FlagUpdateBookmarkLink         string
+	FlagUpdateBookmarkNote         string
+	FlagUpdateBookmarkTag          []string
+	FlagUpdateBookmarkTitle        string
+	Logger                         *logrus.Logger
+	RaindropConfig                 string
+	RaindropHome                   string
+	RD                             *raindrop.Raindrop
+	ValidCollectionsSortOrder      []string
+	ValidStyles                    []string
 }
 
 func (ac *AppContext) GetBackupFlags(cmd *cobra.Command) {
@@ -73,8 +83,9 @@ func (ac *AppContext) GetAddBookmarkFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&ac.FlagAddBookmarkTitle, "title", "t", "", "The title for the new raindrop")
 	cmd.Flags().StringVarP(&ac.FlagAddBookmarkLink, "link", "l", "", "The URL for the new raindrop")
 	cmd.Flags().StringVarP(&ac.FlagAddBookmarkNote, "note", "n", "", "Add a note to the bookmark")
-	cmd.Flags().StringSliceVarP(&ac.FlagAddBookmarkHighlight, "highlight", "i", []string{}, "Bookmark highlight to set; can be used more than once")
-	cmd.Flags().StringSliceVarP(&ac.FlagAddBookmarkTag, "tag", "", []string{}, "The tag to use; can be used more than once")
+	cmd.Flags().StringSliceVar(&ac.FlagAddBookmarkHighlight, "highlight", []string{}, "Bookmark highlight to set; can be used more than once")
+	cmd.Flags().BoolVarP(&ac.FlagAddBookmarkImportant, "important", "i", false, "Set the important flag to true")
+	cmd.Flags().StringSliceVar(&ac.FlagAddBookmarkTag, "tag", []string{}, "The tag to use; can be used more than once")
 
 	cmd.MarkFlagRequired("link")
 	cmd.MarkFlagRequired("title")
@@ -82,6 +93,20 @@ func (ac *AppContext) GetAddBookmarkFlags(cmd *cobra.Command) {
 
 func (ac *AppContext) GetRemoveBookmarkFlags(cmd *cobra.Command) {
 	cmd.Flags().Int64VarP(&ac.FlagRemoveBookmarkId, "id", "i", -1, "ID of the bookmark to remove")
+
+	cmd.MarkFlagRequired("id")
+}
+
+func (ac *AppContext) GetUpdateBookmarkFlags(cmd *cobra.Command) {
+	cmd.Flags().Int64Var(&ac.FlagUpdateBookmarkBookmarkId, "id", -1, "The bookmark ID (use 'raindrop bookmarks list' to find the ID)")
+	cmd.Flags().Int64VarP(&ac.FlagUpdateBookmarkCollectionId, "collection", "c", -1, "The collection ID of the new raindrop (use 'raindrop collections list' to find the ID)")
+	cmd.Flags().StringVarP(&ac.FlagUpdateBookmarkExcerpt, "excerpt", "e", "", "A brief description of the link")
+	cmd.Flags().StringVarP(&ac.FlagUpdateBookmarkTitle, "title", "t", "", "The title for the new raindrop")
+	cmd.Flags().StringVarP(&ac.FlagUpdateBookmarkLink, "link", "l", "", "The URL for the new raindrop")
+	cmd.Flags().StringVarP(&ac.FlagUpdateBookmarkNote, "note", "n", "", "Add a note to the bookmark")
+	cmd.Flags().StringSliceVar(&ac.FlagUpdateBookmarkHighlight, "highlight", []string{}, "Bookmark highlight to set; can be used more than once")
+	cmd.Flags().BoolVarP(&ac.FlagUpdateBookmarkImportant, "important", "i", false, "Set the important flag to true")
+	cmd.Flags().StringSliceVar(&ac.FlagUpdateBookmarkTag, "tag", []string{}, "The tag to use; can be used more than once")
 
 	cmd.MarkFlagRequired("id")
 }

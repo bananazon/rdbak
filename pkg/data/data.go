@@ -14,6 +14,7 @@ type AddBookmarkPayload struct {
 	CollectionId int64    `json:"collectionId,omitempty"`
 	Excerpt      string   `json:"excerpt,omitempty"`
 	Highlights   []string `json:"highlights,omitempty"`
+	Important    bool     `json:"important,omitempty"`
 	Link         string   `json:"link,omitempty"`
 	Note         string   `json:"note,omitempty"`
 	Tags         []string `json:"tags,omitempty"`
@@ -38,6 +39,17 @@ type RenameTagPayload struct {
 	CollectionId int64    `json:"collectionId,omitempty"`
 	NewName      string   `json:"replace,omitempty"`
 	OldName      []string `json:"tags,omitempty"`
+}
+
+type UpdateBookmarkPayload struct {
+	CollectionId int64    `json:"collectionId,omitempty"`
+	Excerpt      string   `json:"excerpt,omitempty"`
+	Highlights   []string `json:"highlights,omitempty"`
+	Important    bool     `json:"important,omitempty"`
+	Link         string   `json:"link,omitempty"`
+	Note         string   `json:"note,omitempty"`
+	Tags         []string `json:"tags,omitempty"`
+	Title        string   `json:"title,omitempty"`
 }
 
 //
@@ -66,6 +78,12 @@ type ListBookmarksResult struct {
 type RemoveBookmarkResult struct {
 	Result       bool   `json:"result" yaml:"result"`
 	ErrorMessage string `json:"errorMessage" yaml:"errorMessage"`
+}
+
+type UpdateBookmarkResult struct {
+	Result       bool     `json:"result" yaml:"result"`
+	Item         Bookmark `json:"item" yaml:"item"`
+	ErrorMessage string   `json:"errorMessage" yaml:"errorMessage"`
 }
 
 // Collections
