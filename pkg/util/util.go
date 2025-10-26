@@ -7,6 +7,7 @@ import (
 	"os/user"
 
 	"github.com/sirupsen/logrus"
+	terminal "github.com/wayneashleyberry/terminal-dimensions"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 	"golang.org/x/term"
 )
@@ -127,4 +128,17 @@ func VerifyDirectory(path string) error {
 		}
 		return nil
 	}
+}
+
+func GetScreenWidth() int {
+	var (
+		err   error
+		width uint
+	)
+	width, err = terminal.Width()
+	if err != nil {
+		return 132
+	}
+
+	return int(width)
 }

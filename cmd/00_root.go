@@ -61,6 +61,7 @@ func init() {
 		Logger:                    util.ConfigureLogger(FlagNoColor, RaindropLogFile),
 		RaindropHome:              RaindropHome,
 		RaindropConfig:            RaindropConfig,
+		ScreenWidth:               util.GetScreenWidth(),
 		ValidCollectionsSortOrder: []string{"title", "-title", "-count"},
 		ValidCollectionsViews:     []string{"grid", "list", "masonry", "simple"},
 		ValidStyles:               []string{"ascii", "bright", "dark", "light"},
