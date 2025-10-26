@@ -16,20 +16,19 @@ func newListTagsCmd(ctx *context.AppContext) (c *cobra.Command) {
 		Use:     "list",
 		Aliases: []string{"l", "ls"},
 		Short:   "List the tags in your raindrop.io account",
-		PreRunE: func(cmdC *cobra.Command, args []string) error {
+		PreRun: func(cmdC *cobra.Command, args []string) {
 			rd, err := raindrop.New(ctx.RaindropHome, ctx.RaindropConfig, ctx.Logger)
 			if err != nil {
-				ctx.Logger.Println("Failed to initialize raindrop:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to initialize raindrop: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
 			ctx.RD = rd
-			return nil
 		},
-		RunE: func(cmdC *cobra.Command, args []string) error {
+		Run: func(cmdC *cobra.Command, args []string) {
 			listTagsResult, err := ctx.RD.API.ListTags()
 			if err != nil {
-				ctx.Logger.Println("Failed to get a list of tags:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to get a list of tags: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
 
 			t := rdtable.GetTableTemplate("Tags", ctx.FlagPageSize, ctx.FlagPageStyle)
@@ -45,8 +44,6 @@ func newListTagsCmd(ctx *context.AppContext) (c *cobra.Command) {
 			}
 
 			fmt.Println(t.Render())
-
-			return nil
 		},
 	}
 

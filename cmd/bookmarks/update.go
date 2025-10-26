@@ -12,16 +12,15 @@ func newUpdateBookmarkCmd(ctx *context.AppContext) (c *cobra.Command) {
 		Use:     "update",
 		Aliases: []string{"u"},
 		Short:   "Update an existing bookmark in your raindrop.io account",
-		PreRunE: func(cmdC *cobra.Command, args []string) error {
+		PreRun: func(cmdC *cobra.Command, args []string) {
 			rd, err := raindrop.New(ctx.RaindropHome, ctx.RaindropConfig, ctx.Logger)
 			if err != nil {
-				ctx.Logger.Println("Failed to initialize raindrop:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to initialize raindrop: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
 			ctx.RD = rd
-			return nil
 		},
-		RunE: func(cmdC *cobra.Command, args []string) error {
+		Run: func(cmdC *cobra.Command, args []string) {
 			_, err := ctx.RD.API.UpdateBookmark(
 				ctx.FlagUpdateBookmarkBookmarkId,
 				data.UpdateBookmarkPayload{
@@ -36,11 +35,10 @@ func newUpdateBookmarkCmd(ctx *context.AppContext) (c *cobra.Command) {
 				},
 			)
 			if err != nil {
-				ctx.Logger.Println("Failed to update the bookmark:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to update the bookmark: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
-			ctx.Logger.Println("Successfully updated the bookmark")
-			return nil
+			ctx.Logger.Infof("Successfully updated the bookmark")
 		},
 	}
 

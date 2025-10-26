@@ -11,23 +11,21 @@ func newBackupCollectionsCmd(ctx *context.AppContext) (c *cobra.Command) {
 		Use:     "backup",
 		Aliases: []string{"b"},
 		Short:   "Back your raindrop.io collections up to a YAML file",
-		PreRunE: func(cmdC *cobra.Command, args []string) error {
+		PreRun: func(cmdC *cobra.Command, args []string) {
 			rd, err := raindrop.New(ctx.RaindropHome, ctx.RaindropConfig, ctx.Logger)
 			if err != nil {
-				ctx.Logger.Println("Failed to initialize raindrop:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to initialize raindrop: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
 			ctx.RD = rd
-			return nil
 		},
-		RunE: func(cmdC *cobra.Command, args []string) error {
+		Run: func(cmdC *cobra.Command, args []string) {
 			err := ctx.RD.BackupCollections(ctx.FlagPrune)
 			if err != nil {
-				ctx.Logger.Println("Failed to back up the collections:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to back up the collections: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
-			ctx.Logger.Println("Successfully backed up the collections")
-			return nil
+			ctx.Logger.Infof("Successfully backed up the collections")
 		},
 	}
 

@@ -12,25 +12,23 @@ func newSortCollectionsCmd(ctx *context.AppContext) (c *cobra.Command) {
 		Use:     "sort",
 		Aliases: []string{"s"},
 		Short:   "Sort your raindrop.io collections",
-		PreRunE: func(cmdC *cobra.Command, args []string) error {
+		PreRun: func(cmdC *cobra.Command, args []string) {
 			rd, err := raindrop.New(ctx.RaindropHome, ctx.RaindropConfig, ctx.Logger)
 			if err != nil {
-				ctx.Logger.Println("Failed to initialize raindrop:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to initialize raindrop: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
 			ctx.RD = rd
-			return nil
 		},
-		RunE: func(cmdC *cobra.Command, args []string) error {
+		Run: func(cmdC *cobra.Command, args []string) {
 			_, err := ctx.RD.API.SortCollections(data.SortCollectionPayload{
 				Sort: ctx.FlagCollectionsSortOrder,
 			})
 			if err != nil {
-				ctx.Logger.Println("Failed to sort the collections:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to sort the collections: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
-			ctx.Logger.Println("Successfully sorted the collections")
-			return nil
+			ctx.Logger.Infof("Successfully sorted the collections")
 		},
 	}
 

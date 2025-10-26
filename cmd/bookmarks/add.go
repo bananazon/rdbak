@@ -12,17 +12,16 @@ func newAddBookmarkCmd(ctx *context.AppContext) (c *cobra.Command) {
 		Use:     "add",
 		Aliases: []string{"a"},
 		Short:   "Add a new bookmark to your raindrop.io account",
-		PreRunE: func(cmdC *cobra.Command, args []string) error {
+		PreRun: func(cmdC *cobra.Command, args []string) {
 			rd, err := raindrop.New(ctx.RaindropHome, ctx.RaindropConfig, ctx.Logger)
 			if err != nil {
-				ctx.Logger.Println("Failed to initialize raindrop:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to initialize raindrop: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
 			ctx.RD = rd
-			return nil
 		},
-		RunE: func(cmdC *cobra.Command, args []string) error {
-			_, err := ctx.RD.API.AddBookmark(data.AddBookmarkPayload{
+		Run: func(cmdC *cobra.Command, args []string) {
+			dataAddBookmarkResult, err := ctx.RD.API.AddBookmark(data.AddBookmarkPayload{
 				CollectionId: int64(ctx.FlagAddBookmarkCollectionId),
 				Excerpt:      ctx.FlagAddBookmarkExcerpt,
 				Link:         ctx.FlagAddBookmarkLink,
@@ -30,11 +29,10 @@ func newAddBookmarkCmd(ctx *context.AppContext) (c *cobra.Command) {
 				Title:        ctx.FlagAddBookmarkTitle,
 			})
 			if err != nil {
-				ctx.Logger.Println("Failed to add the bookmark:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to add the bookmark: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
-			ctx.Logger.Println("Successfully added the bookmark")
-			return nil
+			ctx.Logger.Infof("Successfully added the bookmark with ID %d", dataAddBookmarkResult.Item.Id)
 		},
 	}
 

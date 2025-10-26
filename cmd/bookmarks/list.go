@@ -17,29 +17,35 @@ func newListBookmarksCmd(ctx *context.AppContext) (c *cobra.Command) {
 		Use:     "list",
 		Aliases: []string{"l", "ls"},
 		Short:   "List the bookmarks in your raindrop.io account",
-		PreRunE: func(cmdC *cobra.Command, args []string) error {
+		PreRun: func(cmdC *cobra.Command, args []string) {
 			rd, err := raindrop.New(ctx.RaindropHome, ctx.RaindropConfig, ctx.Logger)
 			if err != nil {
-				ctx.Logger.Println("Failed to initialize raindrop:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to initialize raindrop: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
 			ctx.RD = rd
-			return nil
 		},
-		RunE: func(cmdC *cobra.Command, args []string) error {
+		Run: func(cmdC *cobra.Command, args []string) {
+			if ctx.ScreenWidth < 81 {
+				ctx.Logger.Errorf("Screen width is only %d, please increase it and try again", ctx.ScreenWidth)
+				ctx.Logger.Exit(1)
+			}
 			bookmarks, err := ctx.RD.ListBookmarks()
 			if err != nil {
-				ctx.Logger.Println("Failed to get a list of bookmarks:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to get a list of bookmarks: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
 
 			collections, err := ctx.RD.ListCollections()
 			if err != nil {
-				ctx.Logger.Println("Failed to get a list of collections:", err.Error())
-				return err
+				ctx.Logger.Errorf("Failed to get a list of collections: %s", err.Error())
+				ctx.Logger.Exit(1)
 			}
 
 			t := rdtable.GetTableTemplate("Bookmarks", ctx.FlagPageSize, ctx.FlagPageStyle)
+			// t.SetColumnConfigs([]table.ColumnConfig{
+			// 	{Name: "Link", WidthMax: 50},
+			// })
 			t.SortBy([]table.SortBy{{Name: "Collection", Mode: table.Asc}, {Name: "Link", Mode: table.Asc}})
 			t.AppendHeader(table.Row{"ID", "Collection", "Link", "Tags"})
 
@@ -62,8 +68,6 @@ func newListBookmarksCmd(ctx *context.AppContext) (c *cobra.Command) {
 			}
 
 			fmt.Println(t.Render())
-
-			return nil
 		},
 	}
 
