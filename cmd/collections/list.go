@@ -2,6 +2,7 @@ package collections
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/bananazon/raindrop/pkg/context"
@@ -32,29 +33,39 @@ func newListCollectionsCmd(ctx *context.AppContext) (c *cobra.Command) {
 				ctx.Logger.Exit(1)
 			}
 
-			t := rdtable.GetTableTemplate("Collections", ctx.FlagPageSize, ctx.FlagPageStyle)
-			t.SortBy([]table.SortBy{{Name: "Title", Mode: table.Asc}})
-			t.SetColumnConfigs([]table.ColumnConfig{{Name: "Count", Align: text.AlignLeft}})
-			t.AppendHeader(table.Row{"ID", "Title", "View", "Description", "Count"})
-
-			for _, collection := range collections {
-				var description string
-
-				if collection.Description == "" {
-					description = "N/A"
-				} else {
-					description = collection.Description
+			if ctx.FlagPageStyle == "list" {
+				for _, collection := range collections {
+					fmt.Fprintf(os.Stdout, "%s = %s\n", "         title", collection.Title)
+					fmt.Fprintf(os.Stdout, "%s = %s\n", "          view", collection.View)
+					fmt.Fprintf(os.Stdout, "%s = %s\n", "   description", collection.Description)
+					fmt.Fprintf(os.Stdout, "%s = %d\n", "         count", collection.Count)
+					fmt.Fprintln(os.Stdout, "")
 				}
-				t.AppendRow(table.Row{
-					strconv.Itoa(int(collection.Id)),
-					collection.Title,
-					collection.View,
-					description,
-					collection.Count,
-				})
-			}
+			} else {
+				t := rdtable.GetTableTemplate("Collections", ctx.FlagPageSize, ctx.FlagPageStyle)
+				t.SortBy([]table.SortBy{{Name: "Title", Mode: table.Asc}})
+				t.SetColumnConfigs([]table.ColumnConfig{{Name: "Count", Align: text.AlignLeft}})
+				t.AppendHeader(table.Row{"ID", "Title", "View", "Description", "Count"})
 
-			fmt.Println(t.Render())
+				for _, collection := range collections {
+					var description string
+
+					if collection.Description == "" {
+						description = "N/A"
+					} else {
+						description = collection.Description
+					}
+					t.AppendRow(table.Row{
+						strconv.Itoa(int(collection.Id)),
+						collection.Title,
+						collection.View,
+						description,
+						collection.Count,
+					})
+				}
+
+				fmt.Fprintln(os.Stdout, t.Render())
+			}
 		},
 	}
 

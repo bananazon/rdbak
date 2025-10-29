@@ -2,6 +2,7 @@ package bookmarks
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -26,10 +27,16 @@ func newListBookmarksCmd(ctx *context.AppContext) (c *cobra.Command) {
 			ctx.RD = rd
 		},
 		Run: func(cmdC *cobra.Command, args []string) {
-			if ctx.ScreenWidth < 81 {
-				ctx.Logger.Errorf("Screen width is only %d, please increase it and try again", ctx.ScreenWidth)
-				ctx.Logger.Exit(1)
+			var useList = false
+			if ctx.ScreenWidth < 80 {
+				ctx.Logger.Infof("Screen width is only %d, using list output mode", ctx.ScreenWidth)
+				useList = true
 			}
+
+			if ctx.FlagPageStyle == "list" {
+				useList = true
+			}
+
 			bookmarks, err := ctx.RD.ListBookmarks()
 			if err != nil {
 				ctx.Logger.Errorf("Failed to get a list of bookmarks: %s", err.Error())
@@ -42,14 +49,8 @@ func newListBookmarksCmd(ctx *context.AppContext) (c *cobra.Command) {
 				ctx.Logger.Exit(1)
 			}
 
-			t := rdtable.GetTableTemplate("Bookmarks", ctx.FlagPageSize, ctx.FlagPageStyle)
-			// t.SetColumnConfigs([]table.ColumnConfig{
-			// 	{Name: "Link", WidthMax: 50},
-			// })
-			t.SortBy([]table.SortBy{{Name: "Collection", Mode: table.Asc}, {Name: "Link", Mode: table.Asc}})
-			t.AppendHeader(table.Row{"ID", "Collection", "Link", "Tags"})
-
-			for idx, raindrop := range bookmarks {
+			// Find and set collection name
+			for idx, _ := range bookmarks {
 				bookmarks[idx].Collection.Name = "Unsorted"
 				collectionId := bookmarks[idx].Collection.Id
 				collection, exists := collections[uint64(collectionId)]
@@ -58,16 +59,43 @@ func newListBookmarksCmd(ctx *context.AppContext) (c *cobra.Command) {
 						bookmarks[idx].Collection.Name = collection.Title
 					}
 				}
-
-				t.AppendRow(table.Row{
-					strconv.Itoa(int(raindrop.Id)),
-					raindrop.Collection.Name,
-					raindrop.Link,
-					strings.Join(raindrop.Tags, ","),
-				})
 			}
 
-			fmt.Println(t.Render())
+			if useList {
+				for _, bookmark := range bookmarks {
+					fmt.Fprintf(os.Stdout, "%s = %d\n", "           id", bookmark.Id)
+					fmt.Fprintf(os.Stdout, "%s = %s\n", "   collection", bookmark.Collection.Name)
+					fmt.Fprintf(os.Stdout, "%s = %s\n", "         link", bookmark.Link)
+					fmt.Fprintf(os.Stdout, "%s = %s\n", "         tags", strings.Join(bookmark.Tags, ","))
+					fmt.Fprintln(os.Stdout, "")
+				}
+			} else {
+				maxIdWidth := 12
+				maxCollectionWidth := 20
+				maxTagsWidth := 30
+
+				t := rdtable.GetTableTemplate("Bookmarks", ctx.FlagPageSize, ctx.FlagPageStyle)
+
+				t.SetColumnConfigs([]table.ColumnConfig{
+					{Name: "ID", WidthMax: maxIdWidth},
+					{Name: "Collection", WidthMax: maxCollectionWidth},
+					{Name: "Tags", WidthMax: maxTagsWidth},
+					{Name: "Link", WidthMax: ctx.ScreenWidth - (maxIdWidth + maxCollectionWidth + maxTagsWidth)},
+				})
+				t.SortBy([]table.SortBy{{Name: "Collection", Mode: table.Asc}, {Name: "Link", Mode: table.Asc}})
+				t.AppendHeader(table.Row{"ID", "Collection", "Link", "Tags"})
+
+				for _, bookmark := range bookmarks {
+					t.AppendRow(table.Row{
+						strconv.Itoa(int(bookmark.Id)),
+						bookmark.Collection.Name,
+						bookmark.Link,
+						strings.Join(bookmark.Tags, ","),
+					})
+				}
+
+				fmt.Fprintln(os.Stdout, t.Render())
+			}
 		},
 	}
 

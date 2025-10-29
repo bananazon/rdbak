@@ -2,6 +2,7 @@ package tags
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/bananazon/raindrop/pkg/context"
 	"github.com/bananazon/raindrop/pkg/raindrop"
@@ -31,19 +32,27 @@ func newListTagsCmd(ctx *context.AppContext) (c *cobra.Command) {
 				ctx.Logger.Exit(1)
 			}
 
-			t := rdtable.GetTableTemplate("Tags", ctx.FlagPageSize, ctx.FlagPageStyle)
-			t.SortBy([]table.SortBy{{Name: "ID", Mode: table.Asc}})
-			t.SetColumnConfigs([]table.ColumnConfig{{Name: "Count", Align: text.AlignLeft}})
-			t.AppendHeader(table.Row{"ID", "Count"})
+			if ctx.FlagPageStyle == "list" {
+				for _, tag := range listTagsResult.Items {
+					fmt.Fprintf(os.Stdout, "%s = %s\n", "      id", tag.Id)
+					fmt.Fprintf(os.Stdout, "%s = %d\n", "   count", tag.Count)
+					fmt.Fprintln(os.Stdout, "")
+				}
+			} else {
+				t := rdtable.GetTableTemplate("Tags", ctx.FlagPageSize, ctx.FlagPageStyle)
+				t.SortBy([]table.SortBy{{Name: "ID", Mode: table.Asc}})
+				t.SetColumnConfigs([]table.ColumnConfig{{Name: "Count", Align: text.AlignLeft}})
+				t.AppendHeader(table.Row{"ID", "Count"})
 
-			for _, tag := range listTagsResult.Items {
-				t.AppendRow(table.Row{
-					tag.Id,
-					tag.Count,
-				})
+				for _, tag := range listTagsResult.Items {
+					t.AppendRow(table.Row{
+						tag.Id,
+						tag.Count,
+					})
+				}
+
+				fmt.Fprintln(os.Stdout, t.Render())
 			}
-
-			fmt.Println(t.Render())
 		},
 	}
 
