@@ -64,7 +64,7 @@ func init() {
 		ScreenWidth:               util.GetScreenWidth(),
 		ValidCollectionsSortOrder: []string{"title", "-title", "-count"},
 		ValidCollectionsViews:     []string{"grid", "list", "masonry", "simple"},
-		ValidStyles:               []string{"ascii", "bright", "dark", "light"},
+		ValidStyles:               []string{"ascii", "bright", "dark", "light", "list"},
 	}
 
 	RootCmd.AddCommand(bookmarks.NewBookmarksCmd(ctx))
