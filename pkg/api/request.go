@@ -2,10 +2,12 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 	"time"
 )
@@ -60,8 +62,8 @@ func (ac *APIClient) Request(request APIRequest) (response APIResponse) {
 	response.Status = resp.Status
 	response.StatusCode = resp.StatusCode
 
-	if resp.StatusCode != http.StatusOK {
-		response.Error = fmt.Errorf("non-200 code: %d: %s", resp.StatusCode, resp.Status)
+	if !slices.Contains([]int{200, 201}, resp.StatusCode) {
+		response.Error = errors.New(http.StatusText(resp.StatusCode))
 		return response
 	}
 
