@@ -41,7 +41,7 @@ func Execute() error {
 func init() {
 	homeDir, err = util.GetHome()
 	if err != nil {
-		fmt.Println("failed to determine home directory")
+		fmt.Fprintln(os.Stderr, "failed to determine home directory")
 		os.Exit(1)
 	}
 
@@ -50,7 +50,7 @@ func init() {
 
 	err = util.VerifyDirectory(RaindropHome)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 
