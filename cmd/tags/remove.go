@@ -24,6 +24,7 @@ func newRemoveTagsCmd(ctx *context.AppContext) (c *cobra.Command) {
 				CollectionId: ctx.FlagRenameTagCollectionId,
 				Tags:         ctx.FlagRemoveTagsTagNames,
 			})
+
 			if err != nil {
 				ctx.Logger.Errorf("Failed to remove the tags: %s", err.Error())
 				ctx.Logger.Exit(1)
