@@ -111,8 +111,6 @@ func (ac *APIClient) UpdateBookmark(bookmarkId int64, payload data.UpdateBookmar
 		return updateBookmarkResult, response.Error
 	}
 
-	fmt.Println(string(response.Body))
-
 	err = json.Unmarshal(response.Body, &updateBookmarkResult)
 	if err != nil {
 		return updateBookmarkResult, err
